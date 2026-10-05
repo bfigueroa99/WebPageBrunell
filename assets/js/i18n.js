@@ -1,5 +1,5 @@
 /*
- * Brunell Node — textos en inglés.
+ * Brunell — textos en inglés.
  *
  * El español vive en index.html (es el texto base y funciona sin JavaScript).
  * Cada clave corresponde a un atributo data-i18n="clave" del HTML; los valores
@@ -8,9 +8,9 @@
  */
 window.BrunellI18n = {
   en: {
-    'meta.title': 'Brunell Node — Cameras that understand what they see',
-    'meta.desc': 'Brunell Node turns the cameras you already have into a system that detects, understands and alerts you when something matters. Everything happens on your own premises, without sending images to the cloud.',
-    'meta.ogTitle': 'Brunell Node — Cameras that understand what they see',
+    'meta.title': 'Brunell — Cameras that understand what they see',
+    'meta.desc': 'Brunell turns the cameras you already have into a system that detects, understands and alerts you when something matters. Everything happens on your own premises, without sending images to the cloud.',
+    'meta.ogTitle': 'Brunell — Cameras that understand what they see',
     'meta.ogDesc': 'AI-powered video monitoring that detects, understands and alerts. No cloud, on your own premises.',
 
     'skip': 'Skip to content',
@@ -18,7 +18,7 @@ window.BrunellI18n = {
     'intro.2': 'Connecting cameras',
     'intro.3': 'Analysis online',
 
-    'brand.aria': 'Brunell Node, back to top',
+    'brand.aria': 'Brunell, back to top',
     'nav.aria': 'Main',
     'nav.how': 'How it works',
     'nav.dashboards': 'Dashboards',
@@ -37,11 +37,11 @@ window.BrunellI18n = {
     'hud.inview': 'in view',
     'hud.local': 'Processed locally · no cloud',
 
-    'hero.eyebrow': 'Brunell Node — AI-powered video monitoring',
+    'hero.eyebrow': 'Brunell — AI-powered video monitoring',
     'hero.l1': 'Your cameras',
     'hero.l2': 'already see it all.',
     'hero.l3': 'Now they get it.',
-    'hero.lede': 'Brunell Node turns the cameras you already have into a system that detects, understands and alerts you when something matters. Everything happens on your own premises: not a single image goes to the cloud.',
+    'hero.lede': 'Brunell turns the cameras you already have into a system that detects, understands and alerts you when something matters. Everything happens on your own premises: not a single image goes to the cloud.',
     'hero.cta1': 'Request a demo',
     'hero.cta2': 'See how it works',
     'scroll.aria': 'Keep scrolling',
@@ -55,13 +55,13 @@ window.BrunellI18n = {
     'ticker.6': 'Writes its own reports',
 
     'manifesto.eyebrow': 'The problem',
-    'manifesto.text': 'A regular camera records hours of footage nobody ever gets to watch. Brunell Node watches it for you, understands what is happening and speaks up only when it truly matters.',
+    'manifesto.text': 'A regular camera records hours of footage nobody ever gets to watch. Brunell watches it for you, understands what is happening and speaks up only when it truly matters.',
 
     'story.eyebrow': 'How it works',
     'story.title': 'From images to answers,<br>in three steps.',
     'step1.kicker': 'Connect',
     'step1.title': 'Use the cameras you already have.',
-    'step1.text': 'Brunell Node runs on a computer inside your premises and connects to your network cameras. It can even find them on its own. Within minutes you see your whole site on a single screen.',
+    'step1.text': 'Brunell runs on a computer inside your premises and connects to your network cameras. It can even find them on its own. Within minutes you see your whole site on a single screen.',
     'step2.kicker': 'Understand',
     'step2.title': 'Every frame, analyzed instantly.',
     'step2.text': 'Artificial intelligence recognizes people and vehicles, follows their path and counts how many come in, go out or stay in each zone you define.',
@@ -78,7 +78,7 @@ window.BrunellI18n = {
 
     'incidents.eyebrow': 'Behavior',
     'incidents.title': 'It recognizes situations,<br>not just motion.',
-    'incidents.lede': 'A typical system goes off at every shadow. Brunell Node understands what people are doing and tells everyday activity apart from what needs your attention.',
+    'incidents.lede': 'A typical system goes off at every shadow. Brunell understands what people are doing and tells everyday activity apart from what needs your attention.',
     'incidents.tabsAria': 'Incident types',
     'tab1.name': 'Loitering',
     'tab1.desc': 'Someone stays too long where they shouldn’t be.',
@@ -223,7 +223,7 @@ window.BrunellI18n = {
     'phone.kicker': 'On your phone',
     'phone.title': 'Always with you.',
     'phone.text': 'Install it on your phone like an app and, if you turn on notifications, get every alert instantly.',
-    'phone.note': '<b>Brunell Node</b>Possible fall · CAM 03',
+    'phone.note': '<b>Brunell</b>Possible fall · CAM 03',
     'panic.kicker': 'Silent alarm',
     'panic.title': 'Call for help without anyone noticing.',
     'panic.text': 'If someone is under pressure, they can raise the alarm discreetly, without alerting anyone else.',
@@ -235,7 +235,7 @@ window.BrunellI18n = {
 
     'privacy.eyebrow': 'Privacy by design',
     'privacy.title': 'What happens on your premises stays on your premises.',
-    'privacy.lede': 'Brunell Node runs inside your network. Images are analyzed on your own computer and nothing goes out to the internet unless you decide so.',
+    'privacy.lede': 'Brunell runs inside your network. Images are analyzed on your own computer and nothing goes out to the internet unless you decide so.',
     'privacy.check1': 'Works even without an internet connection.',
     'privacy.check2': 'Your images never pass through third-party servers.',
     'privacy.check3': 'Every access protected, with per-person permissions.',
@@ -245,7 +245,7 @@ window.BrunellI18n = {
     'diagram.phone': 'Phone',
     'diagram.network': 'Your network',
 
-    'figures.aria': 'Brunell Node in numbers',
+    'figures.aria': 'Brunell in numbers',
     'fig1': 'of the analysis happens on your own computer',
     'fig2': 'types of behavior it recognizes',
     'fig3': 'access levels for your team',
@@ -253,14 +253,14 @@ window.BrunellI18n = {
 
     'trial.eyebrow': 'Try it today',
     'trial.title': 'No cameras connected yet? No problem.',
-    'trial.lede': 'Brunell Node includes a demo mode with sample cameras, so you can explore all of it before bringing it to your site. It installs in a single step, on your own computer.',
+    'trial.lede': 'Brunell includes a demo mode with sample cameras, so you can explore all of it before bringing it to your site. It installs in a single step, on your own computer.',
     'trial.step1': 'Install in a single step',
     'trial.step2': 'Explore with sample cameras',
     'trial.step3': 'Connect your own whenever you want',
 
     'roadmap.eyebrow': 'Roadmap · October 2026',
     'roadmap.title': 'What we’ve achieved.<br>What’s next.',
-    'roadmap.lede': 'Brunell Node moves forward in stages: first a complete platform, now stability and scale, and then reaching more places just as easily.',
+    'roadmap.lede': 'Brunell moves forward in stages: first a complete platform, now stability and scale, and then reaching more places just as easily.',
     'roadmap.now': 'Today',
     'rsum.1': 'of the current plan is already complete',
     'rsum.2': 'improvements and fixes delivered',
@@ -302,7 +302,7 @@ window.BrunellI18n = {
     'faq.eyebrow': 'FAQ',
     'faq.title': 'What people usually ask us.',
     'faq1.q': 'Do I need internet to use it?',
-    'faq1.a': 'No. Brunell Node works inside your network, even offline. Only if you turn it on can it send alerts outside or connect to other systems.',
+    'faq1.a': 'No. Brunell works inside your network, even offline. Only if you turn it on can it send alerts outside or connect to other systems.',
     'faq2.q': 'Does it work with the cameras I already have?',
     'faq2.a': 'It works with standard network (IP) cameras, the most common kind in businesses, buildings and homes. It can also find them automatically on your network.',
     'faq3.q': 'Where are the images stored?',
@@ -320,10 +320,10 @@ window.BrunellI18n = {
 
     'cta.title': 'See what your cameras<br>aren’t telling you.',
     'cta.button': 'Request a demo',
-    'cta.subject': 'I’d like to learn more about Brunell Node',
+    'cta.subject': 'I’d like to learn more about Brunell',
 
     'footer.aria': 'Footer',
-    'footer.legal': 'Brunell Node. Smart, local and private video monitoring.',
+    'footer.legal': 'Brunell. Smart, local and private video monitoring.',
 
   },
 
@@ -331,6 +331,6 @@ window.BrunellI18n = {
   es: {
     'menu.open': 'Abrir menú',
     'menu.close': 'Cerrar menú',
-    'cta.subject': 'Quiero conocer Brunell Node',
+    'cta.subject': 'Quiero conocer Brunell',
   },
 };

@@ -1,6 +1,6 @@
 # WebPageBrunell
 
-Página de presentación de **Brunell Node**: un sitio cinematográfico, oscuro y de
+Página de presentación de **Brunell**: un sitio cinematográfico, oscuro y de
 una sola página que explica el producto sin entrar en detalles técnicos, en
 español e inglés y con la paleta de la propia app.
 
@@ -56,7 +56,7 @@ idioma del navegador. Para compartir la versión en inglés: `…/?lang=en`.
 
 ## Paleta
 
-Tomada del CSS de la app Brunell Node: degradado de marca `#667eea → #764ba2`,
+Tomada del CSS de la app Brunell: degradado de marca `#667eea → #764ba2`,
 texto en degradado `#7c92ee → #a888c8`, fondos carbón `#1a1a1a / #2d2d2d`, verde
 `#2ecc71` para estados activos y rojo `#e74c3c / #cf4436` para alertas.
 
