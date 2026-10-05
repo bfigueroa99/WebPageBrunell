@@ -18,8 +18,11 @@
   const DEPTH = 6;          // z=1 está 7 veces más lejos que z=0
   const CAM_H = 1.7;        // altura de la cámara, en alturas de persona
   const Z_UNIT = 19;        // una unidad de z equivale a ~19 alturas de persona
-  const SIGNAL = [140, 255, 180];
-  const ALERT = [255, 77, 58];
+  const SIGNAL = [46, 204, 113];   // personas: el verde con que el producto marca personas y estados activos
+  const VEHICLE = [124, 146, 238]; // vehículos: azul (#7c92ee, el índigo claro de la marca)
+  const ZONE = [134, 153, 238];    // zonas: índigo de marca
+  const ALERT = [231, 76, 60];     // #e74c3c, rojo de alerta de la app
+  const ALERT_LABEL = [207, 68, 54]; // #cf4436, fondo rojo para texto blanco (AA)
   const MONO = '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace';
 
   const reduceMotion = !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -30,6 +33,28 @@
   const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
   const pad = (n) => String(n).padStart(2, '0');
   const mmss = (s) => `${pad(Math.floor(s / 60))}:${pad(Math.floor(s % 60))}`;
+
+  // Textos dibujados en las escenas, por idioma. Cada incidente es [etiqueta, estado].
+  const STR = {
+    es: {
+      person: 'PERSONA', vehicle: 'VEHÍCULO', veh: 'VEH', playback: 'REPRODUCCIÓN', watching: 'Observando',
+      zones: { access: 'ZONA A · ACCESO', inventory: 'ZONA B · INVENTARIO', exitC: 'ZONA C · SALIDA', exitD: 'ZONA D · SALIDA', restricted: 'ZONA RESTRINGIDA' },
+      loiter: ['MERODEO', 'Alerta · Merodeo en zona restringida'],
+      sudden: ['MOVIMIENTO SÚBITO', 'Alerta · Movimiento súbito'],
+      fall: ['POSIBLE CAÍDA', 'Alerta · Posible caída'],
+      fight: ['ALTERCADO', 'Alerta · Altercado entre dos personas'],
+    },
+    en: {
+      person: 'PERSON', vehicle: 'VEHICLE', veh: 'VEH', playback: 'PLAYBACK', watching: 'Monitoring',
+      zones: { access: 'ZONE A · ENTRANCE', inventory: 'ZONE B · INVENTORY', exitC: 'ZONE C · EXIT', exitD: 'ZONE D · EXIT', restricted: 'RESTRICTED ZONE' },
+      loiter: ['LOITERING', 'Alert · Loitering in a restricted zone'],
+      sudden: ['SUDDEN MOVEMENT', 'Alert · Sudden movement'],
+      fall: ['POSSIBLE FALL', 'Alert · Possible fall'],
+      fight: ['ALTERCATION', 'Alert · Altercation between two people'],
+    },
+  };
+  let lang = document.documentElement.lang === 'en' ? 'en' : 'es';
+  const str = () => STR[lang];
 
   function rng(seed) {
     let a = (seed >>> 0) || 1;
@@ -77,7 +102,7 @@
     sg.fillRect(0, 0, 2, 1);
     tex.scan = s;
 
-    const HEAT = [[30, 120, 150], [40, 190, 170], [140, 255, 180], [235, 240, 110], [255, 180, 70], [255, 110, 55], [255, 60, 45]];
+    const HEAT = [[70, 80, 190], [102, 126, 234], [80, 190, 230], [235, 240, 110], [255, 180, 70], [255, 110, 55], [231, 76, 60]];
     tex.heat = HEAT.map((c) => {
       const h = document.createElement('canvas');
       h.width = h.height = 64;
@@ -99,46 +124,46 @@
   /* ------------------------------------------------------------------ */
 
   const STYLE = {
-    wall: { front: '#0c1110', side: '#0a0e0d', top: '#111816', line: 'rgba(170,205,195,0.10)' },
-    shelf: { front: '#0f1514', side: '#0d1312', top: '#141c1a', line: 'rgba(170,205,195,0.13)' },
-    car: { front: '#141a19', side: '#101615', top: '#1a2220', line: 'rgba(190,215,205,0.16)' },
+    wall: { front: '#111113', side: '#0e0e10', top: '#161618', line: 'rgba(200,204,225,0.10)' },
+    shelf: { front: '#141416', side: '#111113', top: '#1a1a1d', line: 'rgba(200,204,225,0.13)' },
+    car: { front: '#19191c', side: '#141416', top: '#202024', line: 'rgba(205,210,230,0.16)' },
   };
 
   const LAYOUTS = {
     plaza: {
-      horizon: 0.36, sky: '#050707', floorFar: '#0a0f0e', floorNear: '#0e1513',
+      horizon: 0.36, sky: '#09090a', floorFar: '#0e0e10', floorNear: '#141416',
       lamp: [255, 176, 100],
       lamps: [[-4.2, 0.24], [5.2, 0.55]],
       hot: [[0, 0.95], [-9, 0.3], [9, 0.36], [-6.5, 0.72], [7, 0.78], [-2.6, 0.07], [3.1, 0.1], [-1.2, 0.45], [1.6, 0.5], [-13, 0.9], [13, 0.88]],
-      zone: { label: 'ZONA A · ACCESO', x: [-1.7, 1.7], z: [0.8, 0.98] },
+      zone: { key: 'access', x: [-1.7, 1.7], z: [0.8, 0.98] },
       build: 'plaza',
     },
     bodega: {
-      horizon: 0.3, sky: '#060808', floorFar: '#0b100f', floorNear: '#101614',
-      lamp: [210, 255, 230],
+      horizon: 0.3, sky: '#0a0a0b', floorFar: '#0f0f11', floorNear: '#161618',
+      lamp: [220, 228, 255],
       hot: [[0, 0.04], [0, 0.68], [-0.9, 0.3], [1, 0.22], [-0.8, 0.55], [0.9, 0.62], [0, 0.4]],
       suspect: [1.05, 0.2],
-      zone: { label: 'ZONA B · INVENTARIO', x: [0.2, 1.5], z: [0.14, 0.27] },
+      zone: { key: 'inventory', x: [0.2, 1.5], z: [0.14, 0.27] },
       build: 'bodega',
     },
     estacionamiento: {
-      horizon: 0.33, sky: '#050708', floorFar: '#0a0e0f', floorNear: '#0e1314',
+      horizon: 0.33, sky: '#09090b', floorFar: '#0e0e10', floorNear: '#141416',
       lamp: [200, 225, 255],
       lamps: [[-5, 0.55], [1, 0.58], [6.5, 0.55]],
       hot: [[-9, 0.28], [9, 0.28], [-3, 0.27], [2, 0.29], [0, 0.06], [-4.5, 0.47], [4, 0.46], [-1, 0.3]],
-      zone: { label: 'ZONA C · SALIDA', x: [-1.2, 1.2], z: [0.21, 0.34] },
+      zone: { key: 'exitC', x: [-1.2, 1.2], z: [0.21, 0.34] },
       cars: { z: 0.28, speed: 3.2 },
       build: 'estacionamiento',
     },
     pasillo: {
-      horizon: 0.45, sky: '#070909', floorFar: '#0c1110', floorNear: '#121917',
-      lamp: [215, 245, 235],
+      horizon: 0.45, sky: '#0b0b0c', floorFar: '#111113', floorNear: '#18181a',
+      lamp: [225, 230, 255],
       hot: [[0, 0.02], [0, 0.78], [-1.3, 0.3], [1.3, 0.45], [-1.2, 0.66], [1.2, 0.15], [0, 0.4]],
-      zone: { label: 'ZONA D · SALIDA', x: [-0.9, 0.9], z: [0.62, 0.79] },
+      zone: { key: 'exitD', x: [-0.9, 0.9], z: [0.62, 0.79] },
       build: 'pasillo',
     },
     patio: {
-      horizon: 0.34, sky: '#050707', floorFar: '#0a0f0e', floorNear: '#0f1614',
+      horizon: 0.34, sky: '#09090a', floorFar: '#0e0e10', floorNear: '#151517',
       lamp: [255, 180, 105],
       lamps: [[-5.6, 0.2], [5.6, 0.55]],
       hot: [[0, 0.3]],
@@ -153,13 +178,13 @@
   const SCRIPTS = {
     loiter: {
       T: 12, speedup: 40,
-      zone: { label: 'ZONA RESTRINGIDA', x: [0.3, 2.9], z: [0.15, 0.27] },
+      zone: { key: 'restricted', x: [0.3, 2.9], z: [0.15, 0.27] },
       actors: [
         { id: 214, keys: [[0, 5.8, 0.22], [3.6, 1.6, 0.2], [12, 1.6, 0.2]], dwell: true },
         { id: 215, keys: [[0.5, -5.8, 0.11], [9, 5.8, 0.12], [12, 5.8, 0.12]] },
         { id: 216, keys: [[0, -9.5, 0.5], [12, 0.5, 0.52]] },
       ],
-      alert: { at: 6, who: [0], label: 'MERODEO', status: 'Alerta · Merodeo en zona restringida' },
+      alert: { at: 6, who: [0] },
     },
     sudden: {
       T: 10,
@@ -167,7 +192,7 @@
         { id: 302, keys: [[0, -5.8, 0.2], [3.8, -1.6, 0.2], [4.9, 2.6, 0.17], [5.6, 3.1, 0.17], [10, 3.15, 0.17]] },
         { id: 303, keys: [[0, 6.8, 0.4], [10, -2, 0.42]] },
       ],
-      alert: { at: 4.2, who: [0], label: 'MOVIMIENTO SÚBITO', status: 'Alerta · Movimiento súbito' },
+      alert: { at: 4.2, who: [0] },
     },
     fall: {
       T: 11,
@@ -175,7 +200,7 @@
         { id: 418, keys: [[0, -5.8, 0.18], [4, -0.6, 0.18], [11, -0.6, 0.18]], fallAt: 4 },
         { id: 419, keys: [[0, 9.6, 0.5], [11, -1, 0.52]] },
       ],
-      alert: { at: 5.3, who: [0], label: 'POSIBLE CAÍDA', status: 'Alerta · Posible caída' },
+      alert: { at: 5.3, who: [0] },
     },
     fight: {
       T: 11,
@@ -184,7 +209,7 @@
         { id: 522, keys: [[0, 5.8, 0.21], [3.4, 0.42, 0.21], [11, 0.42, 0.21]], fightAt: 3.5, face: -1 },
         { id: 523, keys: [[0, 9.6, 0.55], [5, 4, 0.55], [11, 4, 0.55]] },
       ],
-      alert: { at: 4.8, who: [0, 1], group: true, label: 'ALTERCADO', status: 'Alerta · Altercado entre dos personas' },
+      alert: { at: 4.8, who: [0, 1], group: true },
     },
   };
 
@@ -399,8 +424,8 @@
     }
 
     setScenario(name, initial) {
-      this.script = SCRIPTS[name] || SCRIPTS.loiter;
-      this.scriptName = name;
+      this.scriptName = SCRIPTS[name] ? name : 'loiter';
+      this.script = SCRIPTS[this.scriptName];
       this.st = 0;
       this.resetScript();
       if (!initial && reduceMotion) this.freeze();
@@ -414,7 +439,13 @@
         return { spec: a, i, id: a.id, x: p[0], z: p[1], rx: p[0], phase: i * 1.7, move: 0, trail: [], trailT: 0, conf: 0.9 + i * 0.02, fall: 0, fight: false };
       });
       this.cars = [];
-      if (this.o.onStatus) this.o.onStatus('Observando', false);
+      this.emitStatus();
+    }
+
+    // Avisa a la página si el guion está observando o ya disparó su alerta.
+    emitStatus() {
+      if (!this.o.onStatus || !this.script) return;
+      this.o.onStatus(this.fired ? str()[this.scriptName][1] : str().watching, !!this.fired);
     }
 
     resize() {
@@ -462,7 +493,7 @@
       const L = this.L, W = this.W, H = this.H;
 
       const sky = g.createLinearGradient(0, 0, 0, this.hy);
-      sky.addColorStop(0, '#030404');
+      sky.addColorStop(0, '#060607');
       sky.addColorStop(1, L.sky);
       g.fillStyle = sky;
       g.fillRect(0, 0, W, H);
@@ -481,12 +512,12 @@
       g.lineWidth = 1;
       for (let x = -24; x <= 24; x += 1.5) {
         const a = this.P(x, 0, 0), b = this.P(x, 0, 1.4);
-        g.strokeStyle = 'rgba(140,255,180,0.035)';
+        g.strokeStyle = 'rgba(124,146,238,0.05)';
         g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
       }
       for (let z = 0; z <= 1.4; z += 0.05) {
         const a = this.P(-40, 0, z), b = this.P(40, 0, z);
-        g.strokeStyle = `rgba(140,255,180,${(0.045 * (1 - z / 1.5)).toFixed(3)})`;
+        g.strokeStyle = `rgba(124,146,238,${(0.06 * (1 - z / 1.5)).toFixed(3)})`;
         g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
       }
     }
@@ -536,7 +567,7 @@
     }
 
     facade(g, r, z, height, litRatio, doorX) {
-      quad(g, this.P(-30, 0, z), this.P(30, 0, z), this.P(30, height, z), this.P(-30, height, z), '#0a0e0e', 'rgba(170,205,195,0.08)');
+      quad(g, this.P(-30, 0, z), this.P(30, 0, z), this.P(30, height, z), this.P(-30, height, z), '#0f0f11', 'rgba(200,204,225,0.08)');
       for (let col = -12; col <= 12; col++) {
         for (let row = 0; row < 4; row++) {
           const x0 = col * 2.2 - 0.6, y0 = 1.7 + row * 0.95;
@@ -544,18 +575,18 @@
           const lit = r() < litRatio;
           const warm = r() < 0.75;
           quad(g, this.P(x0, y0, z), this.P(x0 + 1.2, y0, z), this.P(x0 + 1.2, y0 + 0.6, z), this.P(x0, y0 + 0.6, z),
-            lit ? (warm ? `rgba(255,190,120,${(0.1 + r() * 0.2).toFixed(2)})` : `rgba(180,220,255,${(0.08 + r() * 0.14).toFixed(2)})`) : 'rgba(150,175,170,0.035)',
-            'rgba(170,205,195,0.06)');
+            lit ? (warm ? `rgba(255,190,120,${(0.1 + r() * 0.2).toFixed(2)})` : `rgba(180,220,255,${(0.08 + r() * 0.14).toFixed(2)})`) : 'rgba(180,184,200,0.035)',
+            'rgba(200,204,225,0.06)');
         }
       }
       // Puerta iluminada y su luz derramada sobre el piso.
-      this.pool(g, doorX, z, 3, [200, 240, 225], 0.2);
+      this.pool(g, doorX, z, 3, [215, 222, 255], 0.2);
       const d0 = this.P(doorX - 1, 0, z), d1 = this.P(doorX + 1, 0, z), d2 = this.P(doorX + 1, 1.45, z), d3 = this.P(doorX - 1, 1.45, z);
       const dg = g.createLinearGradient(0, d3.y, 0, d0.y);
-      dg.addColorStop(0, 'rgba(205,245,228,0.55)');
-      dg.addColorStop(1, 'rgba(160,220,200,0.25)');
-      quad(g, d0, d1, d2, d3, dg, 'rgba(220,255,240,0.4)');
-      quad(g, this.P(doorX - 1.5, 1.55, z), this.P(doorX + 1.5, 1.55, z), this.P(doorX + 1.5, 1.68, z), this.P(doorX - 1.5, 1.68, z), 'rgba(140,255,180,0.35)');
+      dg.addColorStop(0, 'rgba(222,228,255,0.55)');
+      dg.addColorStop(1, 'rgba(170,182,240,0.25)');
+      quad(g, d0, d1, d2, d3, dg, 'rgba(230,235,255,0.4)');
+      quad(g, this.P(doorX - 1.5, 1.55, z), this.P(doorX + 1.5, 1.55, z), this.P(doorX + 1.5, 1.68, z), this.P(doorX - 1.5, 1.68, z), 'rgba(124,146,238,0.5)');
     }
 
     build_plaza(g, r) {
@@ -579,16 +610,16 @@
     build_bodega(g, r) {
       const L = this.L;
       const zf = 0.75;
-      quad(g, this.P(-12, 0, zf), this.P(12, 0, zf), this.P(12, 4.6, zf), this.P(-12, 4.6, zf), '#0b100f', 'rgba(170,205,195,0.08)');
+      quad(g, this.P(-12, 0, zf), this.P(12, 0, zf), this.P(12, 4.6, zf), this.P(-12, 4.6, zf), '#101012', 'rgba(200,204,225,0.08)');
       // Portón enrollable con un hilo de luz por debajo.
       const p0 = this.P(-1.8, 0, zf), p1 = this.P(1.8, 0, zf), p2 = this.P(1.8, 2.5, zf), p3 = this.P(-1.8, 2.5, zf);
-      quad(g, p0, p1, p2, p3, '#101615', 'rgba(170,205,195,0.16)');
-      g.strokeStyle = 'rgba(170,205,195,0.08)';
+      quad(g, p0, p1, p2, p3, '#151517', 'rgba(200,204,225,0.16)');
+      g.strokeStyle = 'rgba(200,204,225,0.08)';
       for (let y = 0.2; y < 2.5; y += 0.18) {
         const a = this.P(-1.8, y, zf), b = this.P(1.8, y, zf);
         g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
       }
-      this.pool(g, 0, zf, 2.4, [210, 255, 230], 0.18);
+      this.pool(g, 0, zf, 2.4, [220, 228, 255], 0.18);
       // Líneas de seguridad del piso.
       g.strokeStyle = 'rgba(235,220,120,0.14)';
       g.lineWidth = 1.2;
@@ -606,7 +637,7 @@
           const xi = x1 < 0 ? x1 : x0;
           for (let y = 0.55; y < 2.6; y += 0.6) {
             const a = this.P(xi, y, z0), b = this.P(xi, y, z1);
-            g.strokeStyle = 'rgba(170,205,195,0.16)';
+            g.strokeStyle = 'rgba(200,204,225,0.16)';
             g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
             let z = z0 + 0.005;
             while (z < z1 - 0.02) {
@@ -622,7 +653,7 @@
       });
       for (let z = 0.02; z < zf; z += 0.12) {
         const a = this.P(-0.6, 3.4, z), b = this.P(0.6, 3.4, z);
-        g.strokeStyle = 'rgba(225,255,240,0.75)';
+        g.strokeStyle = 'rgba(235,238,255,0.75)';
         g.lineWidth = Math.max(1, 0.06 * a.k);
         g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
         this.glow(g, 0, 3.4, z, 1.2, L.lamp, 0.12);
@@ -631,7 +662,7 @@
 
     build_estacionamiento(g, r) {
       const L = this.L;
-      quad(g, this.P(-40, 0, 0.62), this.P(40, 0, 0.62), this.P(40, 1.2, 0.62), this.P(-40, 1.2, 0.62), '#0b100f', 'rgba(170,205,195,0.1)');
+      quad(g, this.P(-40, 0, 0.62), this.P(40, 0, 0.62), this.P(40, 1.2, 0.62), this.P(-40, 1.2, 0.62), '#101012', 'rgba(200,204,225,0.1)');
       // Luces lejanas de la ciudad.
       for (let i = 0; i < 60; i++) {
         const p = this.P(-40 + r() * 80, 1.4 + r() * 2.5, 1.6);
@@ -641,7 +672,7 @@
       L.lamps.forEach(([x, z]) => this.lampPost(g, x, z, 3.6, L.lamp));
       const rows = [[0.36, 0.5], [0.06, 0.2]];
       rows.forEach(([z0, z1]) => {
-        g.strokeStyle = 'rgba(225,235,230,0.2)';
+        g.strokeStyle = 'rgba(230,232,240,0.2)';
         g.lineWidth = 1.2;
         for (let x = -12; x <= 12; x += 1.5) {
           const a = this.P(x, 0, z0), b = this.P(x, 0, z1);
@@ -663,25 +694,25 @@
     build_pasillo(g, r) {
       const L = this.L;
       const zf = 0.8, X = 2.2, Hh = 3.2;
-      quad(g, this.P(-X, Hh, -0.1), this.P(X, Hh, -0.1), this.P(X, Hh, zf), this.P(-X, Hh, zf), '#080b0b');
-      quad(g, this.P(-X, 0, -0.1), this.P(-X, 0, zf), this.P(-X, Hh, zf), this.P(-X, Hh, -0.1), '#0d1312', 'rgba(170,205,195,0.08)');
-      quad(g, this.P(X, 0, -0.1), this.P(X, 0, zf), this.P(X, Hh, zf), this.P(X, Hh, -0.1), '#0d1312', 'rgba(170,205,195,0.08)');
-      quad(g, this.P(-X, 0, zf), this.P(X, 0, zf), this.P(X, Hh, zf), this.P(-X, Hh, zf), '#101716', 'rgba(170,205,195,0.1)');
-      this.pool(g, 0, zf, 1.6, [200, 240, 225], 0.22);
-      quad(g, this.P(-0.7, 0, zf), this.P(0.7, 0, zf), this.P(0.7, 1.3, zf), this.P(-0.7, 1.3, zf), 'rgba(195,240,222,0.4)', 'rgba(220,255,240,0.4)');
-      quad(g, this.P(-0.35, 1.5, zf), this.P(0.35, 1.5, zf), this.P(0.35, 1.75, zf), this.P(-0.35, 1.75, zf), 'rgba(140,255,180,0.8)');
+      quad(g, this.P(-X, Hh, -0.1), this.P(X, Hh, -0.1), this.P(X, Hh, zf), this.P(-X, Hh, zf), '#0b0b0c');
+      quad(g, this.P(-X, 0, -0.1), this.P(-X, 0, zf), this.P(-X, Hh, zf), this.P(-X, Hh, -0.1), '#121214', 'rgba(200,204,225,0.08)');
+      quad(g, this.P(X, 0, -0.1), this.P(X, 0, zf), this.P(X, Hh, zf), this.P(X, Hh, -0.1), '#121214', 'rgba(200,204,225,0.08)');
+      quad(g, this.P(-X, 0, zf), this.P(X, 0, zf), this.P(X, Hh, zf), this.P(-X, Hh, zf), '#161618', 'rgba(200,204,225,0.1)');
+      this.pool(g, 0, zf, 1.6, [215, 222, 255], 0.22);
+      quad(g, this.P(-0.7, 0, zf), this.P(0.7, 0, zf), this.P(0.7, 1.3, zf), this.P(-0.7, 1.3, zf), 'rgba(210,218,255,0.4)', 'rgba(230,235,255,0.4)');
+      quad(g, this.P(-0.35, 1.5, zf), this.P(0.35, 1.5, zf), this.P(0.35, 1.75, zf), this.P(-0.35, 1.75, zf), 'rgba(46,204,113,0.85)');
       this.glow(g, 0, 1.62, zf, 1, SIGNAL, 0.25);
       [[-X, 0.12, 0.2], [-X, 0.42, 0.5], [X, 0.28, 0.36], [X, 0.6, 0.66]].forEach(([x, z0, z1]) => {
-        quad(g, this.P(x, 0, z0), this.P(x, 0, z1), this.P(x, 1.3, z1), this.P(x, 1.3, z0), '#0a0f0e', 'rgba(170,205,195,0.18)');
+        quad(g, this.P(x, 0, z0), this.P(x, 0, z1), this.P(x, 1.3, z1), this.P(x, 1.3, z0), '#0f0f11', 'rgba(200,204,225,0.18)');
       });
-      g.strokeStyle = 'rgba(170,205,195,0.12)';
+      g.strokeStyle = 'rgba(200,204,225,0.12)';
       [-X, X].forEach((x) => {
         const a = this.P(x, 0.06, -0.1), b = this.P(x, 0.06, zf);
         g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
       });
       for (let z = 0.04; z < zf; z += 0.14) {
         this.pool(g, 0, z, 2.4, L.lamp, 0.11);
-        quad(g, this.P(-0.5, Hh, z), this.P(0.5, Hh, z), this.P(0.5, Hh, z + 0.022), this.P(-0.5, Hh, z + 0.022), 'rgba(230,255,245,0.8)');
+        quad(g, this.P(-0.5, Hh, z), this.P(0.5, Hh, z), this.P(0.5, Hh, z + 0.022), this.P(-0.5, Hh, z + 0.022), 'rgba(238,240,255,0.8)');
         this.glow(g, 0, Hh, z, 1.3, L.lamp, 0.1);
       }
     }
@@ -740,7 +771,7 @@
       if (!this.fired && t >= S.alert.at) {
         this.fired = true;
         this.flash = 1;
-        if (this.o.onStatus) this.o.onStatus(S.alert.status, true);
+        this.emitStatus();
       }
     }
 
@@ -817,9 +848,9 @@
       if (S) {
         if (S.speedup) {
           g.font = `500 ${this.fs}px ${MONO}`;
-          g.fillStyle = 'rgba(238,241,239,0.7)';
+          g.fillStyle = 'rgba(255,255,255,0.7)';
           g.textBaseline = 'alphabetic';
-          g.fillText(`REPRODUCCIÓN ×${S.speedup}`, 16, H - 16);
+          g.fillText(`${str().playback} ×${S.speedup}`, 16, H - 16);
         }
         // Corte a negro en la costura del loop.
         const t = this.st;
@@ -836,11 +867,14 @@
 
     drawTimestamp(g) {
       const d = new Date();
-      const txt = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}  ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      const date = lang === 'en'
+        ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+        : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+      const txt = `${date}  ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
       g.font = `500 ${this.fs}px ${MONO}`;
       g.textBaseline = 'top';
       g.textAlign = 'right';
-      g.fillStyle = 'rgba(238,241,239,0.75)';
+      g.fillStyle = 'rgba(255,255,255,0.75)';
       g.fillText(txt, this.W - 10, 10);
       g.textAlign = 'left';
     }
@@ -870,7 +904,7 @@
       let n = 0;
       for (const p of this.actors) if (p.x > zone.x[0] && p.x < zone.x[1] && p.z > zone.z[0] && p.z < zone.z[1]) n++;
       const alert = this.script ? this.fired : this.o.alert;
-      const col = alert && n ? ALERT : SIGNAL;
+      const col = alert && n ? ALERT : ZONE;
       quad(g, a, b, c, d, rgba(col, n ? 0.1 : 0.045));
       g.setLineDash([6, 5]);
       quad(g, a, b, c, d, null, rgba(col, 0.6));
@@ -878,7 +912,7 @@
       g.font = `500 ${this.fs * 0.92}px ${MONO}`;
       g.textBaseline = 'bottom';
       g.fillStyle = rgba(col, 0.9);
-      g.fillText(`${zone.label} · ${n}`, d.x + 4, d.y - 5);
+      g.fillText(`${str().zones[zone.key]} · ${n}`, d.x + 4, d.y - 5);
     }
 
     personBox(a) {
@@ -896,7 +930,7 @@
       if (p.x < -k * 1.5 || p.x > this.W + k * 1.5) return;
       // Color opaco (no alfa) para que las uniones del cuerpo no se vean más claras.
       const lum = 0.5 + 0.38 * (1 - clamp(a.z, 0, 1));
-      const body = `rgb(${Math.round(lerp(14, 182, lum))},${Math.round(lerp(20, 200, lum))},${Math.round(lerp(19, 194, lum))})`;
+      const body = `rgb(${Math.round(lerp(16, 190, lum))},${Math.round(lerp(16, 194, lum))},${Math.round(lerp(19, 210, lum))})`;
       g.fillStyle = 'rgba(0,0,0,0.5)';
       g.beginPath();
       g.ellipse(p.x + (a.fall ? 0.4 * k * ease(a.fall) : 0), p.y, (0.2 + 0.4 * (a.fall || 0)) * k, 0.045 * k, 0, 0, TAU);
@@ -951,10 +985,10 @@
       const pts = this.box(g, c.x - L2, c.x + L2, c.z - dz, c.z + dz, 0.85, STYLE.car);
       // Ventanas laterales.
       const wx0 = c.x - L2 + 0.55, wx1 = c.x + L2 - 0.75;
-      quad(g, this.P(wx0, 0.5, c.z - dz), this.P(wx1, 0.5, c.z - dz), this.P(wx1 - 0.1, 0.78, c.z - dz), this.P(wx0 + 0.15, 0.78, c.z - dz), 'rgba(0,0,0,0.55)', 'rgba(190,215,205,0.18)');
+      quad(g, this.P(wx0, 0.5, c.z - dz), this.P(wx1, 0.5, c.z - dz), this.P(wx1 - 0.1, 0.78, c.z - dz), this.P(wx0 + 0.15, 0.78, c.z - dz), 'rgba(0,0,0,0.55)', 'rgba(205,210,230,0.18)');
       [c.x - L2 + 0.55, c.x + L2 - 0.55].forEach((wx) => {
         const w = this.P(wx, 0.16, c.z - dz);
-        g.fillStyle = '#050707';
+        g.fillStyle = '#070708';
         g.beginPath(); g.arc(w.x, w.y, 0.17 * w.k, 0, TAU); g.fill();
       });
       this.glow(g, front, 0.38, c.z - dz, 0.9, [255, 245, 220], 0.45);
@@ -988,9 +1022,11 @@
         const col = isAlert ? ALERT : SIGNAL;
         this.brackets(g, b, col, lw, isAlert);
         let txt;
-        if (isAlert) txt = S && S.speedup ? `${S.alert.label} · ${mmss(this.st * S.speedup)}` : (S ? S.alert.label : 'MERODEO');
-        else if (S && a.spec.dwell) txt = `PERSONA · ${mmss(this.st * S.speedup)}`;
-        else txt = b.w > 34 ? `PERSONA ${Math.round((a.conf || 0.9) * 100)}%` : `#${a.id}`;
+        const tx = str();
+        const alertLabel = tx[S ? this.scriptName : 'loiter'][0];
+        if (isAlert) txt = S && S.speedup ? `${alertLabel} · ${mmss(this.st * S.speedup)}` : alertLabel;
+        else if (S && a.spec.dwell) txt = `${tx.person} · ${mmss(this.st * S.speedup)}`;
+        else txt = b.w > 34 ? `${tx.person} ${Math.round((a.conf || 0.9) * 100)}%` : `#${a.id}`;
         this.label(g, b.x, b.y, txt, col, isAlert);
         if (b.w > 46 && !isAlert) this.smallId(g, b, a.id, col);
       });
@@ -1003,7 +1039,7 @@
         const m = 6;
         const box = { x: x0 - m, y: y0 - m, w: x1 - x0 + m * 2, h: y1 - y0 + m * 2 };
         this.brackets(g, box, ALERT, lw, true);
-        this.label(g, box.x, box.y, S.alert.label, ALERT, true);
+        this.label(g, box.x, box.y, str()[this.scriptName][0], ALERT, true);
       }
 
       // Vehículos.
@@ -1012,8 +1048,8 @@
         const xs = c.pts.map((p) => p.x), ys = c.pts.map((p) => p.y);
         const b = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
         if (b.x + b.w < 0 || b.x > this.W) continue;
-        this.brackets(g, b, SIGNAL, lw, false);
-        this.label(g, b.x, b.y, b.w > 50 ? `VEHÍCULO ${Math.round(c.conf * 100)}%` : 'VEH', SIGNAL, false);
+        this.brackets(g, b, VEHICLE, lw, false);
+        this.label(g, b.x, b.y, b.w > 50 ? `${str().vehicle} ${Math.round(c.conf * 100)}%` : str().veh, VEHICLE, false);
       }
     }
 
@@ -1044,9 +1080,9 @@
       let ly = y - h - 3;
       if (ly < 2) ly = y + 3;
       const lx = clamp(x, 2, this.W - w - 2);
-      g.fillStyle = rgba(col, 0.94);
+      g.fillStyle = rgba(alert ? ALERT_LABEL : col, 0.94);
       g.fillRect(lx, ly, w, h);
-      g.fillStyle = alert ? '#ffffff' : '#03140a';
+      g.fillStyle = alert ? '#ffffff' : '#0f1116';
       g.textBaseline = 'middle';
       g.fillText(text, lx + fs * 0.5, ly + h / 2 + 0.5);
     }
@@ -1063,5 +1099,11 @@
     create: (canvas, opts) => new Scene(canvas, opts),
     scripts: SCRIPTS,
     reduceMotion,
+    // Cambia el idioma de las etiquetas y redibuja todo (también los cuadros
+    // fijos del modo de movimiento reducido).
+    setLang(l) {
+      lang = l === 'en' ? 'en' : 'es';
+      for (const s of scenes) { s.emitStatus(); s.draw(); }
+    },
   };
 })(window);

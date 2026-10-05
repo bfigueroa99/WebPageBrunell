@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Brunell Node — Cámaras que entienden lo que ven</title>
   <meta name="description" content="Brunell Node convierte las cámaras que ya tienes en un sistema que detecta, entiende y te avisa cuando algo importa. Todo ocurre en tu propio lugar, sin enviar imágenes a la nube.">
-  <meta name="theme-color" content="#050607">
+  <meta name="theme-color" content="#161616">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Brunell Node — Cámaras que entienden lo que ven">
   <meta property="og:description" content="Vigilancia con inteligencia artificial que detecta, entiende y avisa. Sin nube, en tu propio lugar.">
@@ -17,19 +17,37 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="assets/css/styles.css">
-  <script>document.documentElement.classList.add('js');</script>
+  <script>
+    // Idioma: ?lang= en la URL, si no la última elección guardada, si no el idioma del navegador.
+    // Se decide aquí, antes de pintar, para no mostrar un destello del otro idioma.
+    (function () {
+      var d = document.documentElement, l = null;
+      d.classList.add('js');
+      try { l = new URLSearchParams(location.search).get('lang'); } catch (e) {}
+      if (l !== 'es' && l !== 'en') { try { l = localStorage.getItem('bn-lang'); } catch (e) {} }
+      if (l !== 'es' && l !== 'en') {
+        var n = (navigator.languages && navigator.languages[0]) || navigator.language || 'es';
+        l = /^es\b/i.test(n) ? 'es' : 'en';
+      }
+      d.lang = l;
+      if (l !== 'es') {
+        d.classList.add('i18n-pending');
+        setTimeout(function () { d.classList.remove('i18n-pending'); }, 3000);
+      }
+    })();
+  </script>
 </head>
 <body>
-  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <a class="skip-link" href="#contenido" data-i18n="skip">Saltar al contenido</a>
 
   <!-- Intro cinematográfica: se salta sola si el usuario prefiere menos movimiento -->
   <div class="intro" aria-hidden="true">
     <div class="intro__inner">
       <div class="intro__mark"><span>B</span></div>
       <ol class="intro__log">
-        <li>Encendiendo nodo</li>
-        <li>Conectando cámaras</li>
-        <li>Análisis activo</li>
+        <li data-i18n="intro.1">Encendiendo nodo</li>
+        <li data-i18n="intro.2">Conectando cámaras</li>
+        <li data-i18n="intro.3">Análisis activo</li>
       </ol>
     </div>
     <div class="intro__bar"><span></span></div>
@@ -39,18 +57,22 @@
   <div class="cursor" aria-hidden="true"></div>
 
   <header class="header">
-    <a class="brand" href="#inicio" aria-label="Brunell Node, ir al inicio">
+    <a class="brand" href="#inicio" aria-label="Brunell Node, ir al inicio" data-i18n-attr="aria-label:brand.aria">
       <span class="brand__mark">B</span>
       <span class="brand__name">Brunell<span>Node</span></span>
     </a>
-    <nav class="nav" id="nav" aria-label="Principal">
-      <a href="#como-funciona">Cómo funciona</a>
-      <a href="#incidentes">Incidentes</a>
-      <a href="#capacidades">Capacidades</a>
-      <a href="#privacidad">Privacidad</a>
-      <a href="#preguntas">Preguntas</a>
+    <nav class="nav" id="nav" aria-label="Principal" data-i18n-attr="aria-label:nav.aria">
+      <a href="#como-funciona" data-i18n="nav.how">Cómo funciona</a>
+      <a href="#incidentes" data-i18n="nav.incidents">Incidentes</a>
+      <a href="#capacidades" data-i18n="nav.capabilities">Capacidades</a>
+      <a href="#privacidad" data-i18n="nav.privacy">Privacidad</a>
+      <a href="#preguntas" data-i18n="nav.faq">Preguntas</a>
     </nav>
-    <a class="btn btn--small btn--primary header__cta" href="#contacto">Solicitar demo</a>
+    <div class="lang" role="group" aria-label="Idioma" data-i18n-attr="aria-label:lang.aria">
+      <button type="button" data-lang="es" lang="es" aria-label="Español" aria-pressed="true">ES</button>
+      <button type="button" data-lang="en" lang="en" aria-label="English" aria-pressed="false">EN</button>
+    </div>
+    <a class="btn btn--small btn--primary header__cta" href="#contacto" data-i18n="cta.header">Solicitar demo</a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav">
       <span class="sr-only">Abrir menú</span><span class="menu-toggle__bars" aria-hidden="true"></span>
     </button>
@@ -69,52 +91,52 @@
         <span class="hud__corner hud__corner--tl"></span><span class="hud__corner hud__corner--tr"></span>
         <span class="hud__corner hud__corner--bl"></span><span class="hud__corner hud__corner--br"></span>
         <div class="hud__row hud__row--top">
-          <span><i class="rec"></i>REC · CAM 01 · ACCESO PRINCIPAL</span>
+          <span><i class="rec"></i><span data-i18n="hud.cam">REC · CAM 01 · ACCESO PRINCIPAL</span></span>
           <span data-clock>00:00:00</span>
         </div>
         <div class="hud__row hud__row--bottom">
-          <span>Detección activa · <b data-hero-count>0</b> en escena</span>
-          <span>Procesado local · sin nube</span>
+          <span><span data-i18n="hud.detect">Detección activa</span> · <b data-hero-count>0</b> <span data-i18n="hud.inview">en escena</span></span>
+          <span data-i18n="hud.local">Procesado local · sin nube</span>
         </div>
       </div>
 
       <div class="hero__content">
-        <p class="eyebrow" data-reveal>Brunell Node — Vigilancia con inteligencia artificial</p>
+        <p class="eyebrow" data-reveal data-i18n="hero.eyebrow">Brunell Node — Vigilancia con inteligencia artificial</p>
         <h1 class="hero__title">
-          <span class="line"><span>Tus cámaras ya</span></span>
-          <span class="line"><span>lo ven todo.</span></span>
-          <span class="line line--accent"><span>Ahora lo entienden.</span></span>
+          <span class="line"><span data-i18n="hero.l1">Tus cámaras ya</span></span>
+          <span class="line"><span data-i18n="hero.l2">lo ven todo.</span></span>
+          <span class="line line--accent"><span data-i18n="hero.l3">Ahora lo entienden.</span></span>
         </h1>
-        <p class="hero__lede" data-reveal style="--d: .5s">
+        <p class="hero__lede" data-reveal style="--d: .5s" data-i18n="hero.lede">
           Brunell Node convierte las cámaras que ya tienes en un sistema que detecta, entiende y te avisa cuando algo importa.
           Todo ocurre en tu propio lugar: ninguna imagen viaja a la nube.
         </p>
         <div class="hero__ctas" data-reveal style="--d: .65s">
-          <a class="btn btn--primary" href="#contacto">Solicitar una demo</a>
-          <a class="btn btn--ghost" href="#como-funciona">Ver cómo funciona</a>
+          <a class="btn btn--primary" href="#contacto" data-i18n="hero.cta1">Solicitar una demo</a>
+          <a class="btn btn--ghost" href="#como-funciona" data-i18n="hero.cta2">Ver cómo funciona</a>
         </div>
       </div>
 
-      <a class="scroll-cue" href="#manifiesto" aria-label="Seguir bajando">
-        <span>Desliza</span><i></i>
+      <a class="scroll-cue" href="#manifiesto" aria-label="Seguir bajando" data-i18n-attr="aria-label:scroll.aria">
+        <span data-i18n="scroll.label">Desliza</span><i></i>
       </a>
     </section>
 
     <!-- ============ TICKER ============ -->
     <div class="ticker" aria-hidden="true">
       <div class="ticker__track">
-        <span>Detecta personas y vehículos</span><span>Sigue cada recorrido</span><span>Cuenta quién entra y quién sale</span>
-        <span>Reconoce comportamientos de riesgo</span><span>Avisa al instante</span><span>Genera reportes solo</span>
-        <span>Detecta personas y vehículos</span><span>Sigue cada recorrido</span><span>Cuenta quién entra y quién sale</span>
-        <span>Reconoce comportamientos de riesgo</span><span>Avisa al instante</span><span>Genera reportes solo</span>
+        <span data-i18n="ticker.1">Detecta personas y vehículos</span><span data-i18n="ticker.2">Sigue cada recorrido</span><span data-i18n="ticker.3">Cuenta quién entra y quién sale</span>
+        <span data-i18n="ticker.4">Reconoce comportamientos de riesgo</span><span data-i18n="ticker.5">Avisa al instante</span><span data-i18n="ticker.6">Genera reportes solo</span>
+        <span data-i18n="ticker.1">Detecta personas y vehículos</span><span data-i18n="ticker.2">Sigue cada recorrido</span><span data-i18n="ticker.3">Cuenta quién entra y quién sale</span>
+        <span data-i18n="ticker.4">Reconoce comportamientos de riesgo</span><span data-i18n="ticker.5">Avisa al instante</span><span data-i18n="ticker.6">Genera reportes solo</span>
       </div>
     </div>
 
     <!-- ============ MANIFIESTO ============ -->
     <section class="manifesto" id="manifiesto">
       <div class="manifesto__sticky">
-        <p class="eyebrow">El problema</p>
-        <p class="manifesto__text" data-scrub>
+        <p class="eyebrow" data-i18n="manifesto.eyebrow">El problema</p>
+        <p class="manifesto__text" data-scrub data-i18n="manifesto.text">
           Una cámara normal graba horas que nadie alcanza a mirar.
           Brunell Node las mira por ti, entiende lo que pasa
           y te habla solo cuando de verdad importa.
@@ -125,8 +147,8 @@
     <!-- ============ CÓMO FUNCIONA (scroll pinneado) ============ -->
     <section class="story" id="como-funciona" aria-labelledby="story-title">
       <header class="section-head">
-        <p class="eyebrow" data-reveal>Cómo funciona</p>
-        <h2 id="story-title" class="section-title" data-reveal>De imágenes a respuestas,<br>en tres tiempos.</h2>
+        <p class="eyebrow" data-reveal data-i18n="story.eyebrow">Cómo funciona</p>
+        <h2 id="story-title" class="section-title" data-reveal data-i18n="story.title">De imágenes a respuestas,<br>en tres tiempos.</h2>
       </header>
 
       <div class="story__track">
@@ -136,19 +158,19 @@
             <div class="story__rail" aria-hidden="true"><span></span></div>
             <ol class="story__steps">
               <li class="step is-active" data-step="0">
-                <p class="step__kicker">Conecta</p>
-                <h3>Usa las cámaras que ya tienes.</h3>
-                <p>Brunell Node se instala en un equipo dentro de tu lugar y se conecta a tus cámaras de red. Incluso puede encontrarlas por sí solo. En minutos ves todo tu recinto en una sola pantalla.</p>
+                <p class="step__kicker" data-i18n="step1.kicker">Conecta</p>
+                <h3 data-i18n="step1.title">Usa las cámaras que ya tienes.</h3>
+                <p data-i18n="step1.text">Brunell Node se instala en un equipo dentro de tu lugar y se conecta a tus cámaras de red. Incluso puede encontrarlas por sí solo. En minutos ves todo tu recinto en una sola pantalla.</p>
               </li>
               <li class="step" data-step="1">
-                <p class="step__kicker">Entiende</p>
-                <h3>Cada imagen, analizada al instante.</h3>
-                <p>La inteligencia artificial reconoce personas y vehículos, sigue su recorrido y cuenta cuántos entran, salen o permanecen en cada zona que tú definas.</p>
+                <p class="step__kicker" data-i18n="step2.kicker">Entiende</p>
+                <h3 data-i18n="step2.title">Cada imagen, analizada al instante.</h3>
+                <p data-i18n="step2.text">La inteligencia artificial reconoce personas y vehículos, sigue su recorrido y cuenta cuántos entran, salen o permanecen en cada zona que tú definas.</p>
               </li>
               <li class="step" data-step="2">
-                <p class="step__kicker">Avisa</p>
-                <h3>Te habla cuando importa.</h3>
-                <p>Si alguien merodea, cae o hay un altercado, recibes el aviso al momento en tu computador o en tu celular, con el clip listo para revisar o compartir.</p>
+                <p class="step__kicker" data-i18n="step3.kicker">Avisa</p>
+                <h3 data-i18n="step3.title">Te habla cuando importa.</h3>
+                <p data-i18n="step3.text">Si alguien merodea, cae o hay un altercado, recibes el aviso al momento en tu computador o en tu celular, con el clip listo para revisar o compartir.</p>
               </li>
             </ol>
           </div>
@@ -157,28 +179,28 @@
             <div class="monitor">
               <figure class="feed">
                 <canvas class="scene" data-scene="feed" data-layout="plaza" data-seed="11"></canvas>
-                <figcaption>CAM 01 · Acceso</figcaption>
+                <figcaption data-i18n="feed.1">CAM 01 · Acceso</figcaption>
               </figure>
               <figure class="feed feed--suspect">
                 <canvas class="scene" data-scene="feed" data-layout="bodega" data-seed="27" data-suspect="true"></canvas>
-                <figcaption>CAM 02 · Bodega</figcaption>
+                <figcaption data-i18n="feed.2">CAM 02 · Bodega</figcaption>
               </figure>
               <figure class="feed">
                 <canvas class="scene" data-scene="feed" data-layout="estacionamiento" data-seed="5"></canvas>
-                <figcaption>CAM 03 · Estacionamiento</figcaption>
+                <figcaption data-i18n="feed.3">CAM 03 · Estacionamiento</figcaption>
               </figure>
               <figure class="feed">
                 <canvas class="scene" data-scene="feed" data-layout="pasillo" data-seed="42"></canvas>
-                <figcaption>CAM 04 · Pasillo</figcaption>
+                <figcaption data-i18n="feed.4">CAM 04 · Pasillo</figcaption>
               </figure>
             </div>
             <div class="toast">
               <span class="toast__icon"></span>
               <div>
-                <strong>Merodeo detectado</strong>
-                <span>CAM 02 · Bodega · hace un instante</span>
+                <strong data-i18n="toast.title">Merodeo detectado</strong>
+                <span data-i18n="toast.meta">CAM 02 · Bodega · hace un instante</span>
               </div>
-              <span class="toast__cta">Ver clip</span>
+              <span class="toast__cta" data-i18n="toast.cta">Ver clip</span>
             </div>
           </div>
         </div>
@@ -189,47 +211,47 @@
     <section class="incidents" id="incidentes" aria-labelledby="incidents-title">
       <header class="section-head section-head--split">
         <div>
-          <p class="eyebrow" data-reveal>Comportamiento</p>
-          <h2 id="incidents-title" class="section-title" data-reveal>Reconoce situaciones,<br>no solo movimiento.</h2>
+          <p class="eyebrow" data-reveal data-i18n="incidents.eyebrow">Comportamiento</p>
+          <h2 id="incidents-title" class="section-title" data-reveal data-i18n="incidents.title">Reconoce situaciones,<br>no solo movimiento.</h2>
         </div>
-        <p class="section-lede" data-reveal>Un sistema común se activa con cualquier sombra. Brunell Node entiende lo que hacen las personas y distingue lo cotidiano de lo que necesita tu atención.</p>
+        <p class="section-lede" data-reveal data-i18n="incidents.lede">Un sistema común se activa con cualquier sombra. Brunell Node entiende lo que hacen las personas y distingue lo cotidiano de lo que necesita tu atención.</p>
       </header>
 
       <div class="incidents__body">
-        <div class="incidents__tabs" role="tablist" aria-label="Tipos de incidente">
+        <div class="incidents__tabs" role="tablist" aria-label="Tipos de incidente" data-i18n-attr="aria-label:incidents.tabsAria">
           <button class="itab is-active" role="tab" aria-selected="true" aria-controls="incident-screen" data-scenario="loiter" type="button">
             <span class="itab__num">01</span>
-            <span class="itab__name">Merodeo</span>
-            <span class="itab__desc">Alguien permanece demasiado tiempo donde no debería.</span>
+            <span class="itab__name" data-i18n="tab1.name">Merodeo</span>
+            <span class="itab__desc" data-i18n="tab1.desc">Alguien permanece demasiado tiempo donde no debería.</span>
             <span class="itab__bar"><i></i></span>
           </button>
           <button class="itab" role="tab" aria-selected="false" aria-controls="incident-screen" data-scenario="sudden" type="button" tabindex="-1">
             <span class="itab__num">02</span>
-            <span class="itab__name">Movimiento súbito</span>
-            <span class="itab__desc">Una carrera o un movimiento brusco fuera de lo normal.</span>
+            <span class="itab__name" data-i18n="tab2.name">Movimiento súbito</span>
+            <span class="itab__desc" data-i18n="tab2.desc">Una carrera o un movimiento brusco fuera de lo normal.</span>
             <span class="itab__bar"><i></i></span>
           </button>
           <button class="itab" role="tab" aria-selected="false" aria-controls="incident-screen" data-scenario="fall" type="button" tabindex="-1">
             <span class="itab__num">03</span>
-            <span class="itab__name">Posible caída</span>
-            <span class="itab__desc">Una persona cae y no se levanta. Cada segundo cuenta.</span>
+            <span class="itab__name" data-i18n="tab3.name">Posible caída</span>
+            <span class="itab__desc" data-i18n="tab3.desc">Una persona cae y no se levanta. Cada segundo cuenta.</span>
             <span class="itab__bar"><i></i></span>
           </button>
           <button class="itab" role="tab" aria-selected="false" aria-controls="incident-screen" data-scenario="fight" type="button" tabindex="-1">
             <span class="itab__num">04</span>
-            <span class="itab__name">Altercado</span>
-            <span class="itab__desc">Dos personas en un enfrentamiento físico.</span>
+            <span class="itab__name" data-i18n="tab4.name">Altercado</span>
+            <span class="itab__desc" data-i18n="tab4.desc">Dos personas en un enfrentamiento físico.</span>
             <span class="itab__bar"><i></i></span>
           </button>
         </div>
 
-        <div class="incidents__screen" id="incident-screen" role="tabpanel" aria-label="Simulación del incidente seleccionado">
+        <div class="incidents__screen" id="incident-screen" role="tabpanel" aria-label="Simulación del incidente seleccionado" data-i18n-attr="aria-label:screen.aria">
           <canvas class="scene" data-scene="incident" aria-hidden="true"></canvas>
           <div class="screen-hud" aria-hidden="true">
-            <span><i class="rec"></i>CAM 03 · Patio interior</span>
+            <span><i class="rec"></i><span data-i18n="screen.cam">CAM 03 · Patio interior</span></span>
             <span class="screen-hud__status" data-incident-status>Observando</span>
           </div>
-          <p class="incidents__note">Simulación ilustrativa</p>
+          <p class="incidents__note" data-i18n="screen.note">Simulación ilustrativa</p>
         </div>
       </div>
     </section>
@@ -238,10 +260,10 @@
     <section class="capabilities" id="capacidades" aria-labelledby="cap-title">
       <header class="section-head section-head--split">
         <div>
-          <p class="eyebrow" data-reveal>Capacidades</p>
-          <h2 id="cap-title" class="section-title" data-reveal>Una sola plataforma.<br>Todo bajo control.</h2>
+          <p class="eyebrow" data-reveal data-i18n="cap.eyebrow">Capacidades</p>
+          <h2 id="cap-title" class="section-title" data-reveal data-i18n="cap.title">Una sola plataforma.<br>Todo bajo control.</h2>
         </div>
-        <p class="section-lede" data-reveal>Pensado para quienes cuidan un lugar: comercios, bodegas, edificios, colegios o el hogar. Sin pantallas confusas ni configuraciones eternas.</p>
+        <p class="section-lede" data-reveal data-i18n="cap.lede">Pensado para quienes cuidan un lugar: comercios, bodegas, edificios, colegios o el hogar. Sin pantallas confusas ni configuraciones eternas.</p>
       </header>
 
       <div class="bento">
@@ -250,17 +272,17 @@
             <canvas class="scene" data-scene="heat" aria-hidden="true"></canvas>
           </div>
           <div class="card__body">
-            <p class="card__kicker">Mapa de calor</p>
-            <h3>Descubre por dónde se mueve la gente.</h3>
-            <p>Visualiza las zonas de más tránsito de cada cámara y toma decisiones con información real de tu espacio.</p>
+            <p class="card__kicker" data-i18n="heat.kicker">Mapa de calor</p>
+            <h3 data-i18n="heat.title">Descubre por dónde se mueve la gente.</h3>
+            <p data-i18n="heat.text">Visualiza las zonas de más tránsito de cada cámara y toma decisiones con información real de tu espacio.</p>
           </div>
         </article>
 
         <article class="card card--search" data-reveal style="--d:.08s">
           <div class="card__body">
-            <p class="card__kicker">Búsqueda</p>
-            <h3>Pregúntale a tus cámaras.</h3>
-            <p>Escribe lo que buscas con tus propias palabras y encuentra el momento exacto, sin revisar horas de grabación.</p>
+            <p class="card__kicker" data-i18n="search.kicker">Búsqueda</p>
+            <h3 data-i18n="search.title">Pregúntale a tus cámaras.</h3>
+            <p data-i18n="search.text">Escribe lo que buscas con tus propias palabras y encuentra el momento exacto, sin revisar horas de grabación.</p>
           </div>
           <div class="search-demo" aria-hidden="true">
             <div class="search-demo__bar"><span class="search-demo__icon"></span><span class="search-demo__text" data-typer></span><span class="search-demo__caret"></span></div>
@@ -273,54 +295,54 @@
         <article class="card" data-reveal style="--d:.12s">
           <div class="mini-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <div class="card__body">
-            <p class="card__kicker">Reportes</p>
-            <h3>Reportes que se hacen solos.</h3>
-            <p>Tránsito, ocupación, zonas e incidentes. Pídelos cuando quieras o recíbelos por correo.</p>
+            <p class="card__kicker" data-i18n="reports.kicker">Reportes</p>
+            <h3 data-i18n="reports.title">Reportes que se hacen solos.</h3>
+            <p data-i18n="reports.text">Tránsito, ocupación, zonas e incidentes. Pídelos cuando quieras o recíbelos por correo.</p>
           </div>
         </article>
 
         <article class="card" data-reveal style="--d:.16s">
           <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <div class="card__body">
-            <p class="card__kicker">Sonido</p>
-            <h3>También escucha.</h3>
-            <p>Puede reconocer un vidrio que se rompe, un grito o un ladrido, y sumarlo a tus alertas.</p>
+            <p class="card__kicker" data-i18n="sound.kicker">Sonido</p>
+            <h3 data-i18n="sound.title">También escucha.</h3>
+            <p data-i18n="sound.text">Puede reconocer un vidrio que se rompe, un grito o un ladrido, y sumarlo a tus alertas.</p>
           </div>
         </article>
 
         <article class="card" data-reveal>
-          <div class="chips" aria-hidden="true"><span>Administrador</span><span>Operador</span><span>Visor</span></div>
+          <div class="chips" aria-hidden="true"><span data-i18n="roles.admin">Administrador</span><span data-i18n="roles.operator">Operador</span><span data-i18n="roles.viewer">Visor</span></div>
           <div class="card__body">
-            <p class="card__kicker">Accesos</p>
-            <h3>Cada persona ve lo suyo.</h3>
-            <p>Tú decides quién puede configurar, quién opera y quién solo mira.</p>
+            <p class="card__kicker" data-i18n="roles.kicker">Accesos</p>
+            <h3 data-i18n="roles.title">Cada persona ve lo suyo.</h3>
+            <p data-i18n="roles.text">Tú decides quién puede configurar, quién opera y quién solo mira.</p>
           </div>
         </article>
 
         <article class="card" data-reveal style="--d:.06s">
-          <div class="phone" aria-hidden="true"><span class="phone__notch"></span><span class="phone__note"><b>Brunell Node</b>Posible caída · CAM 03</span></div>
+          <div class="phone" aria-hidden="true"><span class="phone__notch"></span><span class="phone__note" data-i18n="phone.note"><b>Brunell Node</b>Posible caída · CAM 03</span></div>
           <div class="card__body">
-            <p class="card__kicker">En tu celular</p>
-            <h3>Siempre contigo.</h3>
-            <p>Instálalo en tu teléfono como una app y recibe cada aviso al instante.</p>
+            <p class="card__kicker" data-i18n="phone.kicker">En tu celular</p>
+            <h3 data-i18n="phone.title">Siempre contigo.</h3>
+            <p data-i18n="phone.text">Instálalo en tu teléfono como una app y recibe cada aviso al instante.</p>
           </div>
         </article>
 
         <article class="card" data-reveal style="--d:.12s">
           <div class="pulse-dot" aria-hidden="true"><i></i></div>
           <div class="card__body">
-            <p class="card__kicker">Alarma silenciosa</p>
-            <h3>Pedir ayuda sin que se note.</h3>
-            <p>Si alguien está bajo presión, puede dar la alerta de forma discreta, sin alertar a nadie más.</p>
+            <p class="card__kicker" data-i18n="panic.kicker">Alarma silenciosa</p>
+            <h3 data-i18n="panic.title">Pedir ayuda sin que se note.</h3>
+            <p data-i18n="panic.text">Si alguien está bajo presión, puede dar la alerta de forma discreta, sin alertar a nadie más.</p>
           </div>
         </article>
 
         <article class="card" data-reveal style="--d:.18s">
-          <div class="link-pill" aria-hidden="true"><span>clip · incidente</span><b>vence en 24 h</b></div>
+          <div class="link-pill" aria-hidden="true"><span data-i18n="share.pill">clip · incidente</span><b data-i18n="share.expires">vence en 24 h</b></div>
           <div class="card__body">
-            <p class="card__kicker">Compartir</p>
-            <h3>Comparte sin exponer.</h3>
-            <p>Envía el clip de un incidente con un enlace que vence solo y que puedes anular cuando quieras.</p>
+            <p class="card__kicker" data-i18n="share.kicker">Compartir</p>
+            <h3 data-i18n="share.title">Comparte sin exponer.</h3>
+            <p data-i18n="share.text">Envía el clip de un incidente con un enlace que vence solo y que puedes anular cuando quieras.</p>
           </div>
         </article>
       </div>
@@ -330,13 +352,13 @@
     <section class="privacy" id="privacidad" aria-labelledby="privacy-title">
       <div class="privacy__grid">
         <div class="privacy__copy">
-          <p class="eyebrow" data-reveal>Privacidad por diseño</p>
-          <h2 id="privacy-title" class="section-title" data-reveal>Lo que pasa en tu lugar, se queda en tu lugar.</h2>
-          <p class="section-lede" data-reveal>Brunell Node trabaja dentro de tu red. Las imágenes se analizan en tu propio equipo y nada sale a internet a menos que tú lo decidas.</p>
+          <p class="eyebrow" data-reveal data-i18n="privacy.eyebrow">Privacidad por diseño</p>
+          <h2 id="privacy-title" class="section-title" data-reveal data-i18n="privacy.title">Lo que pasa en tu lugar, se queda en tu lugar.</h2>
+          <p class="section-lede" data-reveal data-i18n="privacy.lede">Brunell Node trabaja dentro de tu red. Las imágenes se analizan en tu propio equipo y nada sale a internet a menos que tú lo decidas.</p>
           <ul class="checklist">
-            <li data-reveal>Funciona incluso sin conexión a internet.</li>
-            <li data-reveal style="--d:.08s">Tus imágenes no pasan por servidores de terceros.</li>
-            <li data-reveal style="--d:.16s">Cada acceso protegido, con permisos por persona.</li>
+            <li data-reveal data-i18n="privacy.check1">Funciona incluso sin conexión a internet.</li>
+            <li data-reveal style="--d:.08s" data-i18n="privacy.check2">Tus imágenes no pasan por servidores de terceros.</li>
+            <li data-reveal style="--d:.16s" data-i18n="privacy.check3">Cada acceso protegido, con permisos por persona.</li>
           </ul>
         </div>
 
@@ -344,15 +366,15 @@
           <svg viewBox="0 0 480 420" class="diagram">
             <defs>
               <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#8CFFB4" stop-opacity=".35"/>
-                <stop offset="100%" stop-color="#8CFFB4" stop-opacity="0"/>
+                <stop offset="0%" stop-color="#667eea" stop-opacity=".45"/>
+                <stop offset="100%" stop-color="#764ba2" stop-opacity="0"/>
               </radialGradient>
             </defs>
             <!-- nube tachada -->
             <g class="diagram__cloud">
               <path d="M196 70c-14 0-25-10-25-23s11-23 25-23c4-14 17-23 32-23 17 0 31 12 33 28 13 1 23 10 23 22 0 12-11 21-24 21z" />
               <line x1="176" y1="88" x2="292" y2="4" />
-              <text x="230" y="112" text-anchor="middle">Nube externa</text>
+              <text x="230" y="112" text-anchor="middle" data-i18n="diagram.cloud">Nube externa</text>
             </g>
             <line class="diagram__blocked" x1="240" y1="196" x2="240" y2="124"/>
 
@@ -373,39 +395,39 @@
             <g class="diagram__node">
               <rect x="190" y="220" width="100" height="100" rx="18"/>
               <text x="240" y="276" text-anchor="middle" class="diagram__node-b">B</text>
-              <text x="240" y="346" text-anchor="middle">Tu equipo</text>
+              <text x="240" y="346" text-anchor="middle" data-i18n="diagram.node">Tu equipo</text>
             </g>
 
             <!-- pantallas -->
-            <g class="diagram__screen" transform="translate(394 176)"><rect width="66" height="44" rx="5"/><line x1="20" y1="54" x2="46" y2="54"/><text x="33" y="76" text-anchor="middle">Monitor</text></g>
-            <g class="diagram__screen" transform="translate(410 312)"><rect width="34" height="56" rx="7"/><text x="17" y="80" text-anchor="middle">Celular</text></g>
+            <g class="diagram__screen" transform="translate(394 176)"><rect width="66" height="44" rx="5"/><line x1="20" y1="54" x2="46" y2="54"/><text x="33" y="76" text-anchor="middle" data-i18n="diagram.monitor">Monitor</text></g>
+            <g class="diagram__screen" transform="translate(410 312)"><rect width="34" height="56" rx="7"/><text x="17" y="80" text-anchor="middle" data-i18n="diagram.phone">Celular</text></g>
 
             <!-- borde de "tu red" -->
             <rect class="diagram__perimeter" x="8" y="146" width="464" height="268" rx="22"/>
-            <text class="diagram__perimeter-label" x="24" y="140">Tu red</text>
+            <text class="diagram__perimeter-label" x="24" y="140" data-i18n="diagram.network">Tu red</text>
           </svg>
         </div>
       </div>
     </section>
 
     <!-- ============ CIFRAS ============ -->
-    <section class="figures" aria-label="Brunell Node en cifras">
-      <div class="figure" data-reveal><span class="figure__num" data-count="100" data-suffix="%">100%</span><span class="figure__label">del análisis ocurre en tu propio equipo</span></div>
-      <div class="figure" data-reveal style="--d:.08s"><span class="figure__num" data-count="4">4</span><span class="figure__label">comportamientos de riesgo reconocidos</span></div>
-      <div class="figure" data-reveal style="--d:.16s"><span class="figure__num" data-count="3">3</span><span class="figure__label">niveles de acceso para tu equipo</span></div>
-      <div class="figure" data-reveal style="--d:.24s"><span class="figure__num" data-count="0">0</span><span class="figure__label">cámaras necesarias para probarlo</span></div>
+    <section class="figures" aria-label="Brunell Node en cifras" data-i18n-attr="aria-label:figures.aria">
+      <div class="figure" data-reveal><span class="figure__num" data-count="100" data-suffix="%">100%</span><span class="figure__label" data-i18n="fig1">del análisis ocurre en tu propio equipo</span></div>
+      <div class="figure" data-reveal style="--d:.08s"><span class="figure__num" data-count="4">4</span><span class="figure__label" data-i18n="fig2">comportamientos de riesgo reconocidos</span></div>
+      <div class="figure" data-reveal style="--d:.16s"><span class="figure__num" data-count="3">3</span><span class="figure__label" data-i18n="fig3">niveles de acceso para tu equipo</span></div>
+      <div class="figure" data-reveal style="--d:.24s"><span class="figure__num" data-count="0">0</span><span class="figure__label" data-i18n="fig4">cámaras necesarias para probarlo</span></div>
     </section>
 
     <!-- ============ DEMO ============ -->
     <section class="trial" aria-labelledby="trial-title">
       <div class="trial__inner">
-        <p class="eyebrow" data-reveal>Pruébalo hoy</p>
-        <h2 id="trial-title" class="section-title" data-reveal>¿Aún no tienes cámaras conectadas? No importa.</h2>
-        <p class="section-lede" data-reveal>Brunell Node incluye un modo de demostración con cámaras de ejemplo, para que lo recorras completo antes de llevarlo a tu lugar. Se instala en un solo paso, en tu propio equipo.</p>
+        <p class="eyebrow" data-reveal data-i18n="trial.eyebrow">Pruébalo hoy</p>
+        <h2 id="trial-title" class="section-title" data-reveal data-i18n="trial.title">¿Aún no tienes cámaras conectadas? No importa.</h2>
+        <p class="section-lede" data-reveal data-i18n="trial.lede">Brunell Node incluye un modo de demostración con cámaras de ejemplo, para que lo recorras completo antes de llevarlo a tu lugar. Se instala en un solo paso, en tu propio equipo.</p>
         <ol class="trial__steps">
-          <li data-reveal><span>01</span>Instala en un solo paso</li>
-          <li data-reveal style="--d:.08s"><span>02</span>Explora con cámaras de ejemplo</li>
-          <li data-reveal style="--d:.16s"><span>03</span>Conecta las tuyas cuando quieras</li>
+          <li data-reveal><span>01</span><b data-i18n="trial.step1">Instala en un solo paso</b></li>
+          <li data-reveal style="--d:.08s"><span>02</span><b data-i18n="trial.step2">Explora con cámaras de ejemplo</b></li>
+          <li data-reveal style="--d:.16s"><span>03</span><b data-i18n="trial.step3">Conecta las tuyas cuando quieras</b></li>
         </ol>
       </div>
     </section>
@@ -413,37 +435,37 @@
     <!-- ============ FAQ ============ -->
     <section class="faq" id="preguntas" aria-labelledby="faq-title">
       <header class="section-head">
-        <p class="eyebrow" data-reveal>Preguntas frecuentes</p>
-        <h2 id="faq-title" class="section-title" data-reveal>Lo que suelen preguntarnos.</h2>
+        <p class="eyebrow" data-reveal data-i18n="faq.eyebrow">Preguntas frecuentes</p>
+        <h2 id="faq-title" class="section-title" data-reveal data-i18n="faq.title">Lo que suelen preguntarnos.</h2>
       </header>
       <div class="faq__list">
         <details data-reveal>
-          <summary>¿Necesito internet para usarlo?</summary>
-          <div class="faq__answer"><p>No. Brunell Node funciona dentro de tu red, incluso sin conexión. Solo si tú lo activas puede enviar avisos hacia afuera o conectarse con otros sistemas.</p></div>
+          <summary data-i18n="faq1.q">¿Necesito internet para usarlo?</summary>
+          <div class="faq__answer"><p data-i18n="faq1.a">No. Brunell Node funciona dentro de tu red, incluso sin conexión. Solo si tú lo activas puede enviar avisos hacia afuera o conectarse con otros sistemas.</p></div>
         </details>
         <details data-reveal>
-          <summary>¿Sirve con las cámaras que ya tengo?</summary>
-          <div class="faq__answer"><p>Funciona con cámaras de red (IP) estándar, las más comunes en negocios, edificios y hogares. Además, puede encontrarlas automáticamente dentro de tu red.</p></div>
+          <summary data-i18n="faq2.q">¿Sirve con las cámaras que ya tengo?</summary>
+          <div class="faq__answer"><p data-i18n="faq2.a">Funciona con cámaras de red (IP) estándar, las más comunes en negocios, edificios y hogares. Además, puede encontrarlas automáticamente dentro de tu red.</p></div>
         </details>
         <details data-reveal>
-          <summary>¿Dónde quedan guardadas las imágenes?</summary>
-          <div class="faq__answer"><p>En tu propio equipo. Las imágenes no se suben a la nube ni pasan por servidores de terceros.</p></div>
+          <summary data-i18n="faq3.q">¿Dónde quedan guardadas las imágenes?</summary>
+          <div class="faq__answer"><p data-i18n="faq3.a">En tu propio equipo. Las imágenes no se suben a la nube ni pasan por servidores de terceros.</p></div>
         </details>
         <details data-reveal>
-          <summary>¿Puedo verlo desde el celular?</summary>
-          <div class="faq__answer"><p>Sí. Se instala en el teléfono como una app y te llegan notificaciones apenas ocurre algo importante.</p></div>
+          <summary data-i18n="faq4.q">¿Puedo verlo desde el celular?</summary>
+          <div class="faq__answer"><p data-i18n="faq4.a">Sí. Se instala en el teléfono como una app y te llegan notificaciones apenas ocurre algo importante.</p></div>
         </details>
         <details data-reveal>
-          <summary>¿Quién puede ver las cámaras?</summary>
-          <div class="faq__answer"><p>Solo quien tú autorices. Hay tres niveles de acceso, administrador, operador y visor, para que cada persona vea y haga únicamente lo que le corresponde.</p></div>
+          <summary data-i18n="faq5.q">¿Quién puede ver las cámaras?</summary>
+          <div class="faq__answer"><p data-i18n="faq5.a">Solo quien tú autorices. Hay tres niveles de acceso, administrador, operador y visor, para que cada persona vea y haga únicamente lo que le corresponde.</p></div>
         </details>
         <details data-reveal>
-          <summary>¿Puedo probarlo antes de instalarlo en mi lugar?</summary>
-          <div class="faq__answer"><p>Sí. El modo de demostración trae cámaras y datos de ejemplo, para recorrer todo el sistema sin conectar ningún equipo.</p></div>
+          <summary data-i18n="faq6.q">¿Puedo probarlo antes de instalarlo en mi lugar?</summary>
+          <div class="faq__answer"><p data-i18n="faq6.a">Sí. El modo de demostración trae cámaras y datos de ejemplo, para recorrer todo el sistema sin conectar ningún equipo.</p></div>
         </details>
         <details data-reveal>
-          <summary>¿En qué idioma está?</summary>
-          <div class="faq__answer"><p>En español y en inglés. Se cambia en un clic, sin perder lo que estás viendo.</p></div>
+          <summary data-i18n="faq7.q">¿En qué idioma está?</summary>
+          <div class="faq__answer"><p data-i18n="faq7.a">En español y en inglés. Se cambia en un clic, sin perder lo que estás viendo.</p></div>
         </details>
       </div>
     </section>
@@ -455,9 +477,10 @@
       </div>
       <div class="cta__content">
         <p class="eyebrow" data-reveal>Brunell Node</p>
-        <h2 id="cta-title" class="cta__title" data-reveal>Mira lo que tus cámaras<br>no te están contando.</h2>
-        <!-- Cambia el correo de destino en este enlace (mailto:tu@correo.cl?subject=...) -->
-        <a class="btn btn--primary btn--large" data-reveal href="mailto:?subject=Quiero%20conocer%20Brunell%20Node">Solicitar una demo</a>
+        <h2 id="cta-title" class="cta__title" data-reveal data-i18n="cta.title">Mira lo que tus cámaras<br>no te están contando.</h2>
+        <!-- Cambia el correo de destino en este enlace (mailto:tu@correo.cl?subject=...).
+             El asunto se traduce solo según el idioma; el destinatario no se toca. -->
+        <a class="btn btn--primary btn--large" data-reveal data-i18n="cta.button" data-i18n-subject="cta.subject" href="mailto:?subject=Quiero%20conocer%20Brunell%20Node">Solicitar una demo</a>
       </div>
     </section>
   </main>
@@ -467,16 +490,17 @@
       <span class="brand__mark">B</span>
       <span>Brunelleschi Node</span>
     </div>
-    <nav class="footer__nav" aria-label="Pie de página">
-      <a href="#como-funciona">Cómo funciona</a>
-      <a href="#incidentes">Incidentes</a>
-      <a href="#capacidades">Capacidades</a>
-      <a href="#privacidad">Privacidad</a>
-      <a href="#preguntas">Preguntas</a>
+    <nav class="footer__nav" aria-label="Pie de página" data-i18n-attr="aria-label:footer.aria">
+      <a href="#como-funciona" data-i18n="nav.how">Cómo funciona</a>
+      <a href="#incidentes" data-i18n="nav.incidents">Incidentes</a>
+      <a href="#capacidades" data-i18n="nav.capabilities">Capacidades</a>
+      <a href="#privacidad" data-i18n="nav.privacy">Privacidad</a>
+      <a href="#preguntas" data-i18n="nav.faq">Preguntas</a>
     </nav>
-    <p class="footer__legal">© <span data-year>2026</span> Brunell Node. Vigilancia inteligente, local y privada.</p>
+    <p class="footer__legal">© <span data-year>2026</span> <span data-i18n="footer.legal">Brunell Node. Vigilancia inteligente, local y privada.</span></p>
   </footer>
 
+  <script src="assets/js/i18n.js" defer></script>
   <script src="assets/js/scene.js" defer></script>
   <script src="assets/js/main.js" defer></script>
 </body>

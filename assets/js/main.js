@@ -8,6 +8,78 @@
   const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
+  /* ---------- Idioma ---------- */
+
+  // El español es el texto original del HTML; el inglés vive en i18n.js.
+  // El idioma inicial ya lo decidió el script del <head> (html[lang]).
+  const I18N = window.BrunellI18n || { en: {}, es: {} };
+  let lang = root.lang === 'en' ? 'en' : 'es';
+  const tr = (key) => {
+    const d = I18N[lang] || {};
+    return d[key] != null ? d[key] : null;
+  };
+
+  // Se guarda el español antes de tocar nada, para poder volver a él.
+  const i18nNodes = $$('[data-i18n]').map((el) => ({ el, key: el.dataset.i18n, es: el.innerHTML.trim() }));
+  const i18nAttrs = [];
+  $$('[data-i18n-attr]').forEach((el) => {
+    el.dataset.i18nAttr.split(';').forEach((pair) => {
+      const [attr, key] = pair.split(':').map((s) => s.trim());
+      if (attr && key) i18nAttrs.push({ el, attr, key, es: el.getAttribute(attr) });
+    });
+  });
+  const metaTargets = [
+    { el: $('title'), key: 'meta.title', text: true },
+    { el: $('meta[name="description"]'), key: 'meta.desc' },
+    { el: $('meta[property="og:title"]'), key: 'meta.ogTitle' },
+    { el: $('meta[property="og:description"]'), key: 'meta.ogDesc' },
+  ].filter((m) => m.el).map((m) => Object.assign(m, { es: m.text ? m.el.textContent : m.el.getAttribute('content') }));
+  const langHooks = [];   // secciones con texto armado por JS se registran aquí
+
+  function applyLang(next, remember) {
+    lang = next === 'en' ? 'en' : 'es';
+    root.lang = lang;
+    const en = lang === 'en' ? I18N.en : null;
+    const pick = (key, es) => (en && en[key] != null ? en[key] : es);
+    i18nNodes.forEach((n) => { n.el.innerHTML = pick(n.key, n.es); });
+    i18nAttrs.forEach((a) => a.el.setAttribute(a.attr, pick(a.key, a.es)));
+    metaTargets.forEach((m) => {
+      if (m.text) m.el.textContent = pick(m.key, m.es);
+      else m.el.setAttribute('content', pick(m.key, m.es));
+    });
+    // Solo se traduce el asunto del correo: el destinatario queda como esté en el HTML.
+    $$('[data-i18n-subject]').forEach((a) => {
+      const subject = tr(a.dataset.i18nSubject);
+      if (subject) a.setAttribute('href', a.getAttribute('href').replace(/([?&]subject=)[^&]*/, `$1${encodeURIComponent(subject)}`));
+    });
+    $$('.lang [data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+    langHooks.forEach((fn) => fn(lang));
+    if (window.BrunellScene) window.BrunellScene.setLang(lang);
+    if (remember) {
+      try { localStorage.setItem('bn-lang', lang); } catch (e) { /* sin almacenamiento */ }
+      try {
+        const u = new URL(location.href);
+        u.searchParams.set('lang', lang);
+        history.replaceState(history.state, '', u);
+      } catch (e) { /* URL de solo lectura (p. ej. file://) */ }
+    }
+    root.classList.remove('i18n-pending');
+  }
+
+  // Cambio con un breve fundido a negro, como un corte de cámara.
+  function switchLang(next) {
+    if (next === lang) return;
+    if (reduce) { applyLang(next, true); return; }
+    root.classList.add('lang-fade');
+    setTimeout(() => {
+      applyLang(next, true);
+      requestAnimationFrame(() => root.classList.remove('lang-fade'));
+    }, 200);
+  }
+
+  $$('.lang [data-lang]').forEach((b) => b.addEventListener('click', () => switchLang(b.dataset.lang)));
+  applyLang(lang, false);
+
   /* ---------- Intro ---------- */
 
   const intro = $('.intro');
@@ -94,15 +166,20 @@
   let lastY = window.scrollY;
 
   if (toggle) {
+    const menuLabel = () => {
+      toggle.querySelector('.sr-only').textContent = tr(root.classList.contains('menu-open') ? 'menu.close' : 'menu.open');
+    };
+    menuLabel();
+    langHooks.push(menuLabel);
     toggle.addEventListener('click', () => {
       const open = root.classList.toggle('menu-open');
       toggle.setAttribute('aria-expanded', String(open));
-      toggle.querySelector('.sr-only').textContent = open ? 'Cerrar menú' : 'Abrir menú';
+      menuLabel();
     });
     $$('#nav a').forEach((a) => a.addEventListener('click', () => {
       root.classList.remove('menu-open');
       toggle.setAttribute('aria-expanded', 'false');
-      toggle.querySelector('.sr-only').textContent = 'Abrir menú';
+      menuLabel();
     }));
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && root.classList.contains('menu-open')) { toggle.click(); toggle.focus(); }
@@ -124,13 +201,18 @@
 
   const scrub = $('[data-scrub]');
   let scrubWords = [];
-  if (scrub) {
+  function buildScrub() {
     const text = scrub.textContent.trim().replace(/\s+/g, ' ');
     const words = text.split(' ');
     // Copia legible para lectores de pantalla; las palabras sueltas son solo visuales.
     scrub.innerHTML = `<span class="sr-only">${text}</span>` +
       words.map((w) => `<span class="w" aria-hidden="true">${w}</span>`).join(' ');
     scrubWords = $$('.w', scrub);
+  }
+  if (scrub) {
+    buildScrub();
+    // applyLang deja el texto plano traducido: se vuelve a partir en palabras.
+    langHooks.push(() => { buildScrub(); requestTick(); });
   }
 
   /* ---------- Historia fijada: 3 pasos ---------- */
@@ -277,29 +359,37 @@
 
   const typer = $('[data-typer]');
   const searchDemo = $('.search-demo');
-  const phrases = [
-    'persona con mochila roja',
-    'auto blanco en el estacionamiento',
-    'alguien en la bodega de noche',
-  ];
+  const phrasesFor = () => tr('search.phrases') || [''];
   if (typer && searchDemo) {
     if (reduce) {
-      typer.textContent = phrases[0];
-      searchDemo.classList.add('has-results');
+      const still = () => {
+        typer.textContent = phrasesFor()[0];
+        searchDemo.classList.add('has-results');
+      };
+      still();
+      langHooks.push(still);
     } else {
+      let phrases = phrasesFor();
       let pi = 0, ci = 0, deleting = false, searchVisible = false;
+      // Al cambiar de idioma se borra lo escrito y se empieza con la primera frase nueva.
+      langHooks.push(() => {
+        phrases = phrasesFor();
+        pi = 0; ci = 0; deleting = false;
+        typer.textContent = '';
+        searchDemo.classList.remove('has-results');
+      });
       new IntersectionObserver((es) => { searchVisible = es[0].isIntersecting; }, { threshold: 0.2 }).observe(searchDemo);
       const typeStep = () => {
         let delay = 60 + Math.random() * 50;
         if (searchVisible) {
           const ph = phrases[pi];
           if (!deleting) {
-            ci++;
+            ci = Math.min(ci + 1, ph.length);
             typer.textContent = ph.slice(0, ci);
             if (ci === ph.length) { searchDemo.classList.add('has-results'); deleting = true; delay = 2600; }
           } else {
-            if (ci === phrases[pi].length) searchDemo.classList.remove('has-results');
-            ci--;
+            if (ci === ph.length) searchDemo.classList.remove('has-results');
+            ci = Math.max(ci - 1, 0);
             typer.textContent = ph.slice(0, ci);
             delay = 24;
             if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; delay = 500; }
