@@ -46,7 +46,7 @@ assets/favicon.svg    ícono
 ## Publicar en GitHub Pages
 
 En el repositorio: **Settings → Pages → Build and deployment → Deploy from a
-branch**, elegir la rama `main` y la carpeta `/ (root)`.
+branch**, elegir la rama `master` y la carpeta `/ (root)`.
 
 ## Accesibilidad y rendimiento
 
