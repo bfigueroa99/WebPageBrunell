@@ -1,4 +1,4 @@
-/* Brunell Node — interacción de la página. Sin dependencias. */
+/* Brunell — interacción de la página. Sin dependencias. */
 (function () {
   'use strict';
 

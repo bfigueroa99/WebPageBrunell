@@ -1,7 +1,7 @@
 /* ==========================================================================
-   Brunell Node — estilos
+   Brunell — estilos
    Oscuro y cinematográfico: tipografía grande y grano de película, con la
-   paleta de la app Brunell Node (static/style/*.css del producto):
+   paleta de la app Brunell (static/style/*.css del producto):
    degradado de marca índigo → violeta, grises carbón de fondo, verde para
    "activo" y rojo para alertas.
    ========================================================================== */
@@ -375,7 +375,6 @@ ol, ul { padding: 0; list-style: none; }
   font-weight: 600;
 }
 .brand__name { font-size: 17px; }
-.brand__name span { color: var(--fg-3); margin-left: 4px; font-weight: 500; }
 
 .nav { display: flex; gap: 30px; margin-left: auto; }
 .nav a {

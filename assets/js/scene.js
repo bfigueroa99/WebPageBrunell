@@ -1,5 +1,5 @@
 /*
- * Brunell Node — escenas animadas tipo cámara de seguridad.
+ * Brunell — escenas animadas tipo cámara de seguridad.
  *
  * Todo se dibuja en canvas: no hay video ni imágenes externas. Cada escena es
  * una vista nocturna con perspectiva real (cámara a ~3 m de altura), personas,
