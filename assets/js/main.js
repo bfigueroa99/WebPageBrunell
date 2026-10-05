@@ -195,7 +195,7 @@
       revealIO.unobserve(e.target);
     });
   }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
-  $$('[data-reveal], .monitor').forEach((el) => revealIO.observe(el));
+  $$('[data-reveal], .monitor, .timeline').forEach((el) => revealIO.observe(el));
 
   /* ---------- Texto que se ilumina con el scroll ---------- */
 
@@ -355,52 +355,115 @@
     countIO.observe(el);
   });
 
-  /* ---------- Búsqueda escrita a mano ---------- */
+  /* ---------- Dashboards: pestañas, gráficos y cifras ---------- */
 
-  const typer = $('[data-typer]');
-  const searchDemo = $('.search-demo');
-  const phrasesFor = () => tr('search.phrases') || [''];
-  if (typer && searchDemo) {
-    if (reduce) {
-      const still = () => {
-        typer.textContent = phrasesFor()[0];
-        searchDemo.classList.add('has-results');
-      };
-      still();
-      langHooks.push(still);
-    } else {
-      let phrases = phrasesFor();
-      let pi = 0, ci = 0, deleting = false, searchVisible = false;
-      // Al cambiar de idioma se borra lo escrito y se empieza con la primera frase nueva.
-      langHooks.push(() => {
-        phrases = phrasesFor();
-        pi = 0; ci = 0; deleting = false;
-        typer.textContent = '';
-        searchDemo.classList.remove('has-results');
-      });
-      new IntersectionObserver((es) => { searchVisible = es[0].isIntersecting; }, { threshold: 0.2 }).observe(searchDemo);
-      const typeStep = () => {
-        let delay = 60 + Math.random() * 50;
-        if (searchVisible) {
-          const ph = phrases[pi];
-          if (!deleting) {
-            ci = Math.min(ci + 1, ph.length);
-            typer.textContent = ph.slice(0, ci);
-            if (ci === ph.length) { searchDemo.classList.add('has-results'); deleting = true; delay = 2600; }
-          } else {
-            if (ci === ph.length) searchDemo.classList.remove('has-results');
-            ci = Math.max(ci - 1, 0);
-            typer.textContent = ph.slice(0, ci);
-            delay = 24;
-            if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; delay = 500; }
-          }
-        } else {
-          delay = 400;
-        }
-        setTimeout(typeStep, delay);
-      };
-      setTimeout(typeStep, 800);
+  // Gráfico de línea a partir de data-chart='{"a":[...],"b":[...]}' (24 horas).
+  function buildLineChart(svg) {
+    let data;
+    try { data = JSON.parse(svg.dataset.chart); } catch (e) { return; }
+    const W = 520, H = 190, L = 8, R = 8, T = 10, B = 24;
+    const max = Math.max(...data.a, ...data.b) * 1.1;
+    const x = (i, n) => L + (i / (n - 1)) * (W - L - R);
+    const y = (v) => T + (1 - v / max) * (H - T - B);
+    const path = (arr) => arr.map((v, i) => `${i ? 'L' : 'M'}${x(i, arr.length).toFixed(1)},${y(v).toFixed(1)}`).join('');
+    let html = '<defs>' +
+      '<linearGradient id="dashLine" x1="0" x2="1"><stop offset="0" stop-color="#667eea"/><stop offset="1" stop-color="#a888c8"/></linearGradient>' +
+      '<linearGradient id="dashArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#667eea" stop-opacity=".35"/><stop offset="1" stop-color="#667eea" stop-opacity="0"/></linearGradient>' +
+      '</defs>';
+    for (let g = 0; g <= 3; g++) {
+      const gy = T + (g / 3) * (H - T - B);
+      html += `<line class="chart__grid" x1="${L}" x2="${W - R}" y1="${gy}" y2="${gy}"/>`;
     }
+    [0, 6, 12, 18, 23].forEach((h) => {
+      html += `<text class="chart__axis" x="${x(h, 24).toFixed(1)}" y="${H - 6}" text-anchor="${h === 0 ? 'start' : h === 23 ? 'end' : 'middle'}">${String(h).padStart(2, '0')}:00</text>`;
+    });
+    const a = path(data.a);
+    html += `<path class="chart__area" d="${a}L${x(23, 24)},${H - B}L${L},${H - B}Z"/>`;
+    html += `<path class="chart__line chart__line--b" pathLength="1" d="${path(data.b)}"/>`;
+    html += `<path class="chart__line" pathLength="1" d="${a}"/>`;
+    svg.innerHTML = html;
+  }
+
+  // Barras dobles (entradas / salidas) a partir de data-vbars='[[a,b],...]'.
+  function buildVbars(el) {
+    let data, labels;
+    try { data = JSON.parse(el.dataset.vbars); labels = JSON.parse(el.dataset.labels || '[]'); } catch (e) { return; }
+    const max = Math.max(...data.flat());
+    el.innerHTML = data.map((pair, i) =>
+      `<div class="vbars__col"><div class="vbars__pair">${pair.map((v, k) =>
+        `<i style="--v:${((v / max) * 100).toFixed(1)}%;transition-delay:${(i * 0.04 + k * 0.02).toFixed(2)}s"></i>`).join('')}</div><small>${labels[i] || ''}</small></div>`).join('');
+  }
+
+  function countTo(el, to, dur) {
+    const fmt = (n) => Math.round(n).toLocaleString(lang === 'en' ? 'en-US' : 'es-CL');
+    if (reduce) { el.textContent = fmt(to); return; }
+    const t0 = performance.now();
+    const step = (now) => {
+      const p = clamp((now - t0) / dur, 0, 1);
+      el.textContent = fmt(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  const dtabs = $$('.dtab');
+  const dviews = $$('.dview');
+  const dashWindow = $('.dash__window');
+  let dashSeen = false;
+  let dashAuto = !reduce;
+  let dashVisible = false;
+  $$('.dview .chart[data-chart]').forEach(buildLineChart);
+  $$('.vbars[data-vbars]').forEach(buildVbars);
+
+  function drawView(v) {
+    v.classList.remove('is-drawn');
+    void v.offsetWidth;   // reinicia las transiciones de barras y líneas
+    requestAnimationFrame(() => v.classList.add('is-drawn'));
+    $$('[data-kpi]', v).forEach((el) => countTo(el, Number(el.dataset.kpi), 900));
+  }
+
+  function showView(name, focus) {
+    dtabs.forEach((t) => {
+      const on = t.dataset.view === name;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      if (on && focus) t.focus();
+    });
+    dviews.forEach((v) => {
+      const on = v.id === `dview-${name}`;
+      v.classList.toggle('is-active', on);
+      if (!on) v.classList.remove('is-drawn');
+      else if (dashSeen) drawView(v);
+    });
+  }
+
+  dtabs.forEach((t, i) => {
+    t.addEventListener('click', () => { dashAuto = false; showView(t.dataset.view, false); });
+    t.addEventListener('keydown', (e) => {
+      let n = null;
+      if (e.key === 'ArrowRight') n = (i + 1) % dtabs.length;
+      if (e.key === 'ArrowLeft') n = (i - 1 + dtabs.length) % dtabs.length;
+      if (e.key === 'Home') n = 0;
+      if (e.key === 'End') n = dtabs.length - 1;
+      if (n !== null) { e.preventDefault(); dashAuto = false; showView(dtabs[n].dataset.view, true); }
+    });
+  });
+
+  if (dashWindow) {
+    new IntersectionObserver((es) => {
+      dashVisible = es[0].isIntersecting;
+      if (dashVisible && !dashSeen) {
+        dashSeen = true;
+        const active = $('.dview.is-active');
+        if (active) drawView(active);
+      }
+    }, { threshold: 0.35 }).observe(dashWindow);
+    // Recorre las vistas sola mientras está en pantalla, hasta que el visitante toque una.
+    setInterval(() => {
+      if (!dashAuto || !dashVisible || document.hidden) return;
+      const i = dtabs.findIndex((t) => t.getAttribute('aria-selected') === 'true');
+      showView(dtabs[(i + 1) % dtabs.length].dataset.view, false);
+    }, 6500);
   }
 
   /* ---------- Reloj del HUD ---------- */
