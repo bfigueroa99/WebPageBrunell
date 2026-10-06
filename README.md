@@ -40,10 +40,10 @@ assets/favicon.svg      ícono
 4. **Incidentes** — merodeo, movimiento súbito, posible caída y altercado, cada uno simulado.
 5. **Dashboards y reportes** — una ventana tipo app con las vistas reales (Dashboard,
    Detalle, Incidentes, Reportes) y los tipos de reporte, formatos y envíos programados.
-6. **Capacidades** — mapa de calor, multicámara, seguimiento, reglas de alerta, accesos,
-   celular, alarma silenciosa y clips para compartir.
+6. **Capacidades** — mapa de calor, multicámara, seguimiento, reglas de alerta, accesos
+   y clips para compartir.
 7. **Privacidad** — todo ocurre en el equipo propio, sin nube.
-8. **Cifras y prueba sin cámaras.**
+8. **Cifras.**
 9. **Hoja de ruta** — lo logrado, lo que está en curso y lo que viene.
 10. **Preguntas frecuentes y llamado final.**
 

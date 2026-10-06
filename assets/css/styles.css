@@ -890,47 +890,6 @@ main, .footer { transition: opacity 0.2s ease; }
 }
 .chips span:first-child { border-color: rgba(var(--signal-rgb), 0.55); color: var(--signal-text); }
 
-/* Teléfono */
-.phone {
-  position: relative;
-  width: 132px; height: 110px;
-  margin-bottom: -27px;
-  border: 1px solid var(--line-2);
-  border-bottom: 0;
-  border-radius: 24px 24px 0 0;
-  background: linear-gradient(180deg, #232326, #1a1a1c);
-  overflow: hidden;
-}
-.phone__notch { position: absolute; top: 9px; left: 50%; width: 40px; height: 6px; border-radius: 6px; background: #38383c; transform: translateX(-50%); }
-.phone__note {
-  position: absolute;
-  left: 8px; right: 8px; top: 26px;
-  padding: 8px 9px;
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid var(--line);
-  font-size: 10px;
-  line-height: 1.3;
-  color: var(--fg-2);
-  animation: note 4.5s var(--ease) infinite;
-}
-.phone__note b { display: block; color: var(--fg); font-size: 10.5px; font-weight: 600; }
-.phone__note::before { content: ""; position: absolute; right: 8px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--alert); }
-@keyframes note { 0%, 8% { transform: translateY(-140%); opacity: 0; } 18%, 80% { transform: none; opacity: 1; } 92%, 100% { transform: translateY(-140%); opacity: 0; } }
-
-/* Alarma silenciosa */
-.pulse-dot { position: relative; width: 72px; height: 72px; display: grid; place-items: center; }
-.pulse-dot i { width: 20px; height: 20px; border-radius: 50%; background: var(--alert); box-shadow: 0 0 24px var(--alert); }
-.pulse-dot::before, .pulse-dot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1px solid rgba(var(--alert-rgb), 0.7);
-  animation: ripple 2.4s var(--ease) infinite;
-}
-.pulse-dot::after { animation-delay: 1.2s; }
-
 /* Enlace temporal */
 .link-pill {
   display: inline-flex;
@@ -1004,7 +963,7 @@ main, .footer { transition: opacity 0.2s ease; }
   max-width: var(--maxw);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   border-block: 1px solid var(--line);
 }
 .figure { display: grid; gap: 14px; align-content: start; padding: clamp(32px, 5vw, 64px) var(--pad); border-left: 1px solid var(--line); }
@@ -1022,27 +981,6 @@ main, .footer { transition: opacity 0.2s ease; }
   justify-self: start;
 }
 .figure__label { color: var(--fg-2); font-size: 15px; max-width: 22ch; }
-
-/* ---------- Prueba ---------- */
-
-.trial { padding: clamp(100px, 16vh, 190px) var(--pad); }
-.trial__inner { max-width: 980px; margin: 0 auto; display: grid; justify-items: center; text-align: center; gap: 24px; }
-.trial .section-lede { max-width: 58ch; }
-.trial__steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; width: 100%; margin-top: 24px; }
-.trial__steps li {
-  display: grid;
-  gap: 10px;
-  padding: 22px;
-  border-radius: 16px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  text-align: left;
-  font-size: 17px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-.trial__steps span { font-family: var(--mono); font-size: 12px; color: var(--signal-text); font-weight: 400; }
-.trial__steps b { font-weight: inherit; }
 
 /* ---------- FAQ ---------- */
 
@@ -1244,8 +1182,9 @@ main, .footer { transition: opacity 0.2s ease; }
   .privacy__diagram { max-width: 520px; }
 
   .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .figure:nth-child(3) { border-left: 0; }
-  .figure:nth-child(n + 3) { border-top: 1px solid var(--line); }
+  .figure:first-child { grid-column: 1 / -1; }
+  .figure:nth-child(2) { border-left: 0; }
+  .figure:nth-child(n + 2) { border-top: 1px solid var(--line); }
 
   .footer { grid-template-columns: 1fr; justify-items: start; }
   .footer__nav { justify-content: flex-start; }
@@ -1260,7 +1199,6 @@ main, .footer { transition: opacity 0.2s ease; }
   .hud { font-size: 10px; }
   .hud__row--top > span:first-child { max-width: 62%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .hero__ctas .btn { flex: 1 1 auto; justify-content: center; }
-  .trial__steps { grid-template-columns: 1fr; }
   .figure__label { font-size: 14px; }
   .faq__answer p { padding-right: 0; }
   .screen-hud { font-size: 9.5px; top: 10px; left: 10px; right: 10px; }
@@ -1284,5 +1222,4 @@ main, .footer { transition: opacity 0.2s ease; }
   .ticker__track { animation: none; }
   .js .monitor .feed { clip-path: none; }
   .step { filter: none; }
-  .phone__note { transform: none; opacity: 1; }
 }
