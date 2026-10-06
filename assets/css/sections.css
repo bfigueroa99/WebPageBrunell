@@ -523,6 +523,8 @@
 
 .card--wide { grid-column: span 2; flex-direction: row; align-items: stretch; }
 .card--wide .card__body { align-content: end; flex: 1 1 45%; }
+/* Última fila del bento: dos tarjetas a media anchura. */
+.card--half { grid-column: span 2; }
 
 /* Recorrido multicámara: un punto viaja entre las cámaras donde apareció la misma persona. */
 .trail { position: relative; flex: 1 1 55%; display: grid; align-content: center; gap: 12px; }
@@ -614,6 +616,7 @@
 
 @media (max-width: 1100px) {
   .card--wide { grid-column: span 2; }
+  .card--half { grid-column: auto; }
 }
 @media (max-width: 900px) {
   .incidents__more { margin-top: 12px; }
