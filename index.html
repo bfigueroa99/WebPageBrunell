@@ -556,8 +556,7 @@
     </section>
 
     <!-- ============ ROADMAP ============ -->
-    <!-- Fuente: docs/ROADMAP.md y docs/PLAN_CRECIMIENTO.md de Brunell_Node (octubre 2026),
-         contado en lenguaje simple. Actualizar los números al cerrar cada etapa. -->
+    <!-- Cifras: las escribe node tools/producto.mjs --aplicar desde scripts/loop_progress.sh de Brunell_Node (docs/producto.json). A mano quedan sólo 3× (meta M1 del plan: 8→24 cámaras) y --now. -->
     <section class="roadmap" id="roadmap" aria-labelledby="roadmap-title">
       <header class="section-head section-head--split">
         <div>
@@ -568,15 +567,15 @@
       </header>
 
       <div class="roadmap__summary">
-        <div class="rsum" data-reveal><span class="rsum__num" data-count="91" data-suffix="%">91%</span><span data-i18n="rsum.1">del plan actual ya está completado</span></div>
-        <div class="rsum" data-reveal style="--d:.08s"><span class="rsum__num" data-count="441">441</span><span data-i18n="rsum.2">mejoras y correcciones entregadas</span></div>
+        <div class="rsum" data-reveal><span class="rsum__num" data-count="87" data-suffix="%" data-cifra="backlog.pct">87%</span><span data-i18n="rsum.1">del plan actual ya está completado</span></div>
+        <div class="rsum" data-reveal style="--d:.08s"><span class="rsum__num" data-count="901" data-cifra="backlog.cerrados">901</span><span data-i18n="rsum.2">mejoras y correcciones entregadas</span></div>
         <div class="rsum" data-reveal style="--d:.16s"><span class="rsum__num" data-count="3" data-suffix="×">3×</span><span data-i18n="rsum.3">más cámaras por equipo: la meta de la etapa en curso</span></div>
       </div>
 
       <div class="timeline" style="--now: 58%">
         <div class="timeline__rail" aria-hidden="true"><span></span><em class="timeline__now" data-i18n="roadmap.now">Hoy</em></div>
 
-        <article class="stage stage--done" data-reveal>
+        <article class="stage stage--done" data-fase="2" data-reveal>
           <span class="stage__dot" aria-hidden="true"></span>
           <span class="stage__status" data-i18n="stage.done">Completado</span>
           <h3 data-i18n="stage1.title">Plataforma completa</h3>
@@ -590,20 +589,20 @@
           </ul>
         </article>
 
-        <article class="stage stage--now" data-reveal style="--d:.08s">
+        <article class="stage stage--now" data-fase="0" data-reveal style="--d:.08s">
           <span class="stage__dot" aria-hidden="true"></span>
           <span class="stage__status" data-i18n="stage.now">En curso</span>
           <h3 data-i18n="stage2.title">Estabilidad</h3>
           <div class="stage__progress"><i style="--p: 62%"></i><small data-i18n="stage2.progress">5 de 8 objetivos</small></div>
           <ul>
-            <li class="done" data-i18n="stage2.i1">Más de 440 mejoras y correcciones ya entregadas</li>
+            <li class="done" data-i18n="stage2.i1" data-cifra="backlog.cerrados" data-cifra-formato="mas-de">Más de 900 mejoras y correcciones ya entregadas</li>
             <li class="done" data-i18n="stage2.i2">Recuperación automática si algo se detiene</li>
             <li data-i18n="stage2.i3">Revisión automática de cada mejora antes de publicarla</li>
             <li data-i18n="stage2.i4">Prueba de funcionamiento continuo de 24 horas</li>
           </ul>
         </article>
 
-        <article class="stage stage--now" data-reveal style="--d:.16s">
+        <article class="stage stage--now" data-fase="1" data-reveal style="--d:.16s">
           <span class="stage__dot" aria-hidden="true"></span>
           <span class="stage__status" data-i18n="stage.now">En curso</span>
           <h3 data-i18n="stage3.title">Más cámaras por equipo</h3>
@@ -615,7 +614,7 @@
           </ul>
         </article>
 
-        <article class="stage stage--next" data-reveal style="--d:.24s">
+        <article class="stage stage--next" data-fase="3" data-reveal style="--d:.24s">
           <span class="stage__dot" aria-hidden="true"></span>
           <span class="stage__status" data-i18n="stage.next">Siguiente</span>
           <h3 data-i18n="stage4.title">Llegar a más lugares</h3>

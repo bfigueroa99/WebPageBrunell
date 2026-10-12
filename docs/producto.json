@@ -1,0 +1,15 @@
+{
+  "medido_en": "2026-10-12T18:25:35Z",
+  "commit_dev": "9d5b8986a63c",
+  "fecha_dev": "2026-10-12",
+  "origen": "checkout",
+  "backlog": { "cerrados": 901, "total": 1032, "pct": 87, "abiertos": 131 },
+  "fases": {
+    "0": { "nombre": "Fundaciones", "hechos": 5, "total": 8, "pct": 62, "quedan": ["REACH-1-bloqueador", "REACH-1b", "BUG-29-raíz"] },
+    "1": { "nombre": "Escala", "hechos": 5, "total": 7, "pct": 71, "quedan": ["PERF-12", "PERF-13"] },
+    "2": { "nombre": "Plataforma", "hechos": 9, "total": 9, "pct": 100, "quedan": [] },
+    "3": { "nombre": "Distribución", "hechos": 3, "total": 5, "pct": 60, "quedan": ["REACH-2", "REACH-3"] }
+  },
+  "release": "v2.8.0",
+  "manual": { "rsum.3": "3× = meta M1 del plan (8→24 cámaras)", "--now": "58 % a mano", "li.done": "narrativa, la revisa FIDELIDAD" }
+}

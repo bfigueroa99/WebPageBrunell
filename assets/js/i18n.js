@@ -261,7 +261,7 @@ window.BrunellI18n = {
     'stage1.i5': 'Connection to other systems, when you turn it on',
     'stage2.title': 'Stability',
     'stage2.progress': '5 of 8 goals',
-    'stage2.i1': 'More than 440 improvements and fixes already delivered',
+    'stage2.i1': 'More than 900 improvements and fixes already delivered',
     'stage2.i2': 'Automatic recovery if something stops',
     'stage2.i3': 'Automatic review of every improvement before release',
     'stage2.i4': 'A 24-hour continuous operation test',
