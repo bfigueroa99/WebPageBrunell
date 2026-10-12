@@ -1,6 +1,7 @@
 /* Pruebas de tools/loop.mjs: un MEJORAS.md armado a medida por caso, una copia del repo como
-   raíz (para producto --check y docs/ROUTINE.md) y un `gh` falso en el PATH para no salir a
-   internet. `node --test tools/` las corre. */
+   raíz (para producto --check y docs/ROUTINE.md), un `gh` falso en el PATH para no salir a
+   internet y, cuando hace falta, un origin de mentira (repo bare) con ramas loop/* ya empujadas.
+   `node --test tools/*.test.mjs` las corre. */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -13,14 +14,16 @@ const raiz = join(dirname(fileURLToPath(import.meta.url)), '..');
 const herramienta = join(raiz, 'tools', 'loop.mjs');
 const EJES = ['Fidelidad', 'Descubribilidad', 'Contenido', 'Conversión', 'Accesibilidad', 'Rendimiento y privacidad', 'Idiomas'];
 const MODO = { 1: 'FIDELIDAD', 2: 'EXPANSIÓN', 3: 'CALIDAD', 0: 'EXPANSIÓN' };
+const envGit = { ...process.env, GIT_AUTHOR_NAME: 'prueba', GIT_AUTHOR_EMAIL: 'prueba@localhost', GIT_COMMITTER_NAME: 'prueba', GIT_COMMITTER_EMAIL: 'prueba@localhost' };
 
-/** Hoja de ruta de `n` ítems alternando ejes; `hechos` = números ya tachados. */
-function hojaDe(n, { hechos = [], ejes = ['Descubribilidad', 'Contenido', 'Conversión'], sinPr = [] } = {}) {
+/** Hoja de ruta de `n` ítems alternando ejes; `hechos` = números ya tachados; `titulos` manda sobre «Ítem k». */
+function hojaDe(n, { hechos = [], ejes = ['Descubribilidad', 'Contenido', 'Conversión'], sinPr = [], titulos = [] } = {}) {
   return Array.from({ length: n }, (_, i) => {
     const k = i + 1;
     const eje = ejes[i % ejes.length];
-    if (hechos.includes(k)) return `${k}. ~~**Ítem ${k}**~~${sinPr.includes(k) ? '' : ` hecho en #${k}`} · ${eje}.`;
-    return `${k}. **Ítem ${k}** · ${eje}. Primera entrega. Comprobar: algo. Evidencia: algo.`;
+    const titulo = titulos[i] || `Ítem ${k}`;
+    if (hechos.includes(k)) return `${k}. ~~**${titulo}**~~${sinPr.includes(k) ? '' : ` hecho en #${k}`} · ${eje}.`;
+    return `${k}. **${titulo}** · ${eje}. Primera entrega. Comprobar: algo. Evidencia: algo.`;
   }).join('\n');
 }
 
@@ -50,15 +53,42 @@ function mejoras({ hoja = hojaDe(15), calidad = ['Pendiente uno.', 'Pendiente do
   return '# Mejoras\n\n' + Object.entries(todas).filter(([k]) => !secciones || secciones.includes(k)).map(([k, v]) => `## ${k}\n\n${v}\n`).join('\n');
 }
 
-/** Raíz de prueba: copia del repo (sin .git) con un MEJORAS.md y un `gh` falso que lista `prs`. */
-async function conRaiz(fn, { contenido = mejoras(), prs = [], routine = null } = {}) {
+// El ROUTINE.md del repo con un id de Routine con forma válida, para que las pruebas no dependan
+// de si el archivo real ya tiene el suyo.
+const routineReal = readFileSync(join(raiz, 'docs', 'ROUTINE.md'), 'utf8');
+const routineValida = routineReal.replace(/^- ID: .*$/m, '- ID: trig_01PRUEBA0000000000000abc');
+const conPrompt = (p) => routineValida.replace(/^```prompt\n[\s\S]*?\n```/m, '```prompt\n' + p + '\n```');
+
+/** Raíz de prueba: copia del repo (sin .git) con un MEJORAS.md, un ROUTINE.md válido, un
+    producto.json recién medido y un `gh` falso que lista `prs`. Con `ramasOrigin`, además la
+    raíz es un repo git cuyo origin (bare) ya tiene esas ramas. */
+async function conRaiz(fn, { contenido = mejoras(), prs = [], routine = routineValida, ramasOrigin = [] } = {}) {
   const base = mkdtempSync(join(os.tmpdir(), 'loop-test-'));
   try {
     const dir = join(base, 'repo');
     mkdirSync(dir);
     for (const f of ['index.html', 'assets', 'tools', 'docs', 'CLAUDE.md', '.claude']) cpSync(join(raiz, f), join(dir, f), { recursive: true });
     writeFileSync(join(dir, 'MEJORAS.md'), contenido);
-    if (routine != null) writeFileSync(join(dir, 'docs', 'ROUTINE.md'), routine);
+    writeFileSync(join(dir, 'docs', 'ROUTINE.md'), routine);
+    // La vigencia de 7 días mira medido_en: la copia se da por medida ahora, así la suite no
+    // envejece con el JSON del repo.
+    const rutaJson = join(dir, 'docs', 'producto.json');
+    const j = JSON.parse(readFileSync(rutaJson, 'utf8'));
+    j.medido_en = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+    writeFileSync(rutaJson, JSON.stringify(j, null, 2) + '\n');
+    if (ramasOrigin.length) {
+      const bare = join(base, 'origin.git');
+      const g = (...a) => {
+        const r = spawnSync('git', a, { encoding: 'utf8', env: envGit });
+        assert.equal(r.status, 0, r.stderr);
+      };
+      g('init', '-q', '--bare', bare);
+      g('-C', dir, 'init', '-q');
+      g('-C', dir, 'add', 'MEJORAS.md');
+      g('-C', dir, 'commit', '-q', '-m', 'base');
+      g('-C', dir, 'remote', 'add', 'origin', bare);
+      for (const r of ramasOrigin) g('-C', dir, 'push', '-q', 'origin', `HEAD:refs/heads/${r}`);
+    }
     const bin = join(base, 'bin');
     mkdirSync(bin);
     writeFileSync(join(bin, 'gh'), `#!/bin/sh\ncat <<'EOF'\n${prs.map((p) => JSON.stringify(p)).join('\n')}\nEOF\n`, { mode: 0o755 });
@@ -72,9 +102,7 @@ async function conRaiz(fn, { contenido = mejoras(), prs = [], routine = null } =
   }
 }
 
-const routineReal = readFileSync(join(raiz, 'docs', 'ROUTINE.md'), 'utf8');
-
-test('--check pasa con un MEJORAS.md completo y el ROUTINE.md del repo', async () => {
+test('--check pasa con un MEJORAS.md completo y un ROUTINE.md con id real', async () => {
   await conRaiz(({ correr }) => {
     const r = correr('--check');
     assert.equal(r.rc, 0, r.out + r.err);
@@ -139,8 +167,7 @@ test('guarda 5: la última entrada sin Siguiente o sin PR; --en-curso acepta «P
   }, { contenido: mejoras({ bitacora: bitacoraDe([1, 2], { pendientePr: [2] }) }) });
 });
 
-test('guarda 6: ROUTINE.md sin trig_, con %, con un número de 3 cifras o con una ruta que no existe', async () => {
-  const conPrompt = (p) => routineReal.replace(/^```prompt\n[\s\S]*?\n```/m, '```prompt\n' + p + '\n```');
+test('guarda 6: ROUTINE.md sin id real (o con el placeholder), con %, con un número de 3 cifras, pesado o con una ruta que no existe', async () => {
   await conRaiz(({ correr }) => {
     const r = correr('--check');
     assert.equal(r.rc, 1);
@@ -153,11 +180,13 @@ test('guarda 6: ROUTINE.md sin trig_, con %, con un número de 3 cifras o con un
     assert.match(r.out, /FALLA guarda 6: el prompt de la Routine tiene un «%»/);
     assert.match(r.out, /FALLA guarda 6: el prompt de la Routine tiene un número de 3 o más cifras \(441\)/);
   }, { routine: conPrompt('La página dice 91% y 441 mejoras.') });
-  await conRaiz(({ correr }) => {
-    const r = correr('--check');
-    assert.equal(r.rc, 1);
-    assert.match(r.out, /FALLA guarda 6: docs\/ROUTINE\.md no tiene el id trig_/);
-  }, { routine: routineReal.replace(/trig_[^\n]*/g, 'sin id') });
+  for (const id of ['sin id', 'trig_<se completa al crearla>', 'trig_corto']) {
+    await conRaiz(({ correr }) => {
+      const r = correr('--check');
+      assert.equal(r.rc, 1, `con «${id}» debería fallar`);
+      assert.match(r.out, /FALLA guarda 6: docs\/ROUTINE\.md no tiene un id trig_ real/);
+    }, { routine: routineValida.replace(/^- ID: .*$/m, `- ID: ${id}`) });
+  }
   await conRaiz(({ correr }) => {
     const r = correr('--check');
     assert.equal(r.rc, 1);
@@ -237,4 +266,30 @@ test('--siguiente con un PR abierto para N sale 3; sin pendientes en la hoja sal
     assert.equal(r.rc, 2);
     assert.match(r.err, /FALLO: la hoja de ruta no tiene pendientes/);
   }, { contenido: mejoras({ hoja: hojaDe(3, { hechos: [1, 2, 3] }) }) });
+});
+
+test('--siguiente esquiva una rama loop/<N>-<slug> que ya existe en origin sin PR: -2, -3…', async () => {
+  const contenido = mejoras({ hoja: hojaDe(15, { titulos: ['Prerender por idioma'] }) });
+  await conRaiz(({ correr }) => {
+    const r = correr('--siguiente');
+    assert.equal(r.rc, 0, r.err);
+    assert.match(r.out, /^N=2 modo=EXPANSION eje=Descubribilidad item="Prerender por idioma" .* rama=loop\/2-prerender-por-idioma-2$/m);
+    assert.match(r.err, /^AVISO: loop\/2-prerender-por-idioma ya existe en origin sin PR: uso loop\/2-prerender-por-idioma-2$/m);
+  }, { contenido, ramasOrigin: ['loop/2-prerender-por-idioma'] });
+  await conRaiz(({ correr }) => {
+    const r = correr('--siguiente');
+    assert.match(r.out, / rama=loop\/2-prerender-por-idioma-3$/m);
+  }, { contenido, ramasOrigin: ['loop/2-prerender-por-idioma', 'loop/2-prerender-por-idioma-2'] });
+  // Con la rama libre (y una parecida ocupada), la base.
+  await conRaiz(({ correr }) => {
+    const r = correr('--siguiente');
+    assert.match(r.out, / rama=loop\/2-prerender-por-idioma$/m);
+    assert.doesNotMatch(r.err, /ya existe en origin/);
+  }, { contenido, ramasOrigin: ['loop/2-prerender-por-idioma-2', 'loop/12-prerender-por-idioma'] });
+  // Sin remoto se avisa y se usa la base.
+  await conRaiz(({ correr }) => {
+    const r = correr('--siguiente');
+    assert.match(r.out, / rama=loop\/2-prerender-por-idioma$/m);
+    assert.match(r.err, /^AVISO: no pude consultar las ramas de origin/m);
+  }, { contenido });
 });

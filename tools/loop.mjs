@@ -176,8 +176,29 @@ function siguiente() {
       }
     }
   }
-  const rama = `loop/${N}-${slug(modo === 'FIDELIDAD' && !alta ? 'fidelidad' : item)}`;
+  const rama = ramaLibre(`loop/${N}-${slug(modo === 'FIDELIDAD' && !alta ? 'fidelidad' : item)}`);
   console.log(`N=${N} modo=${modo} eje=${eje} item="${item}" motivo="${motivo}" cifras=${cifras} rama=${rama}`);
+}
+
+/** La rama es determinista: si una sesión anterior la empujó y murió antes del PR, el push de la
+    siguiente sería rechazado y, sin force ni delete, el loop quedaría trabado. Se toma la primera
+    libre en origin (`-2`, `-3`…). Sin remoto, se avisa y se usa la base. */
+function ramaLibre(base) {
+  const existe = (r) => {
+    const q = spawnSync('git', ['-C', raiz, 'ls-remote', '--heads', 'origin', r], { encoding: 'utf8' });
+    if (q.status !== 0) throw new Error((q.stderr || q.error?.message || '').trim().split('\n')[0] || 'git ls-remote falló');
+    return q.stdout.trim().length > 0;
+  };
+  try {
+    if (!existe(base)) return base;
+    let k = 2;
+    while (existe(`${base}-${k}`)) k++;
+    aviso(`${base} ya existe en origin sin PR: uso ${base}-${k}`);
+    return `${base}-${k}`;
+  } catch (e) {
+    aviso(`no pude consultar las ramas de origin (${e.message}): uso ${base}`);
+    return base;
+  }
 }
 
 /* ---------- --check ---------- */
@@ -227,7 +248,7 @@ function check() {
   let bytesPrompt = 0;
   if (routine == null) falla(6, 'no existe docs/ROUTINE.md');
   else {
-    if (!/trig_/.test(routine)) falla(6, 'docs/ROUTINE.md no tiene el id trig_ de la Routine');
+    if (!/\btrig_[0-9A-Za-z]{20,}\b/.test(routine)) falla(6, 'docs/ROUTINE.md no tiene un id trig_ real (la Routine se crea apagada y su id se escribe acá)');
     const bloque = /^```prompt\n([\s\S]*?)\n```/m.exec(routine);
     if (!bloque) falla(6, 'docs/ROUTINE.md no tiene el bloque ```prompt');
     else {
