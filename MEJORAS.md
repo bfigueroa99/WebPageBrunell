@@ -195,5 +195,5 @@ escribe nada). El smoke necesita Playwright con Chromium (`PLAYWRIGHT_CHROMIUM_P
   (REACH-2 sigue abierto).
 - Validado: `bash tools/verificar.sh` (check, test, producto --check, loop --check, smoke con 4
   escenarios).
-- PR: pendiente
+- PR: #4
 - **Siguiente:** iteración 2, EXPANSIÓN, ítem 1 (prerender por idioma, Descubribilidad).
