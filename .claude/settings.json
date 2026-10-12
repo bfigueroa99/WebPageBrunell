@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(git branch *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git merge *)",
+      "Bash(git push -u origin loop/*)",
+      "Bash(git push origin loop/*)",
+      "Bash(git ls-remote *)",
+      "Bash(git show *)",
+      "Bash(git status *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git rev-parse *)",
+      "Bash(node tools/*)",
+      "Bash(bash tools/verificar.sh*)",
+      "Bash(gh api repos/bfigueroa99/WebPageBrunell/*)",
+      "mcp__github__create_pull_request",
+      "mcp__github__update_pull_request",
+      "mcp__github__merge_pull_request",
+      "mcp__github__pull_request_read",
+      "mcp__github__list_pull_requests",
+      "mcp__github__add_issue_comment",
+      "mcp__claude-code-remote__get_trigger",
+      "mcp__claude-code-remote__update_trigger"
+    ]
+  }
+}
