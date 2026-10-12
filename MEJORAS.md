@@ -27,9 +27,11 @@ Pedido de Benjamin, 2026-10-12: **la página fiel al producto y con el mayor alc
    leídos de `origin/master`) + 1. Lo que no está fusionado no cuenta. Lo calcula
    `node tools/loop.mjs --siguiente`, que también dice el modo, el ítem y la rama
    `loop/<N>-<slug>`.
-2. **Cifras primero.** Toda iteración arranca con `node tools/producto.mjs --medir`; si
-   `node tools/producto.mjs --check` da 1, `node tools/producto.mjs --aplicar` entra en el PR de
-   esa iteración, sea cual sea su modo: las cifras se corrigen por evento, no por turno.
+2. **Cifras primero.** Toda iteración arranca con `node tools/producto.mjs --medir`, y el
+   `docs/producto.json` refrescado entra **siempre** en el PR de esa iteración, haya o no desvío:
+   es el «previo» de la próxima FIDELIDAD y la vigencia de 7 días mira el JSON de master. Si
+   `node tools/producto.mjs --check` da 1, `node tools/producto.mjs --aplicar` entra también, sea
+   cual sea el modo: las cifras se corrigen por evento, no por turno.
 3. **Modo por `N mod 4`:**
    - **1 → FIDELIDAD.** Revisión narrativa contra el producto: diff del README y del ROADMAP de
      Brunell_Node entre el `commit_dev` de `git show origin/master:docs/producto.json` y el nuevo
@@ -150,8 +152,10 @@ Lo que necesita a un humano. El loop no lo hace: lo anota acá y en su informe.
   a branch → `master` / (root).
 - Destinatario del `mailto:` (index.html, `#contacto`, el enlace del botón «Solicitar una demo»).
 - Dominio / URL canónica (provisional `https://bfigueroa99.github.io/WebPageBrunell/`).
-- Encender la Routine `trig_…` de `docs/ROUTINE.md` (nace apagada; encenderla es consentir el
-  merge automático).
+- Encender la Routine `trig_01RY3ekYUyVDvTt4SbWpZRao` de `docs/ROUTINE.md` (creada apagada;
+  encenderla es consentir el merge automático). Al crearla avisó que no guarda conectores MCP:
+  sus sesiones pueden correr sin `mcp__github__*`; la skill cae a `gh api` y, si tampoco, deja la
+  rama empujada y lo dice en el informe.
 - «Automatically delete head branches» en el repo (`delete_branch_on_merge:false`).
 - «87 % del plan actual» es el % del backlog y baja mientras se siembran ítems (91 → 87 con 460
   cierres más): ¿rotular «del backlog» o quitarlo?
@@ -183,8 +187,8 @@ escribe nada). El smoke necesita Playwright con Chromium (`PLAYWRIGHT_CHROMIUM_P
 
 - **Bootstrap del loop:** `tools/producto.mjs`, `tools/check.mjs`, `tools/smoke.mjs`,
   `tools/loop.mjs`, `tools/verificar.sh` y sus pruebas `node --test`; este archivo; `CLAUDE.md`,
-  `.claude/settings.json` y la skill `pagina-loop`; `docs/ROUTINE.md` con el prompt de la Routine
-  (nace apagada). Esta iteración corrió en la rama `ccr-665785e4-ya854h` que el harness asignó a la
+  `.claude/settings.json` y la skill `pagina-loop`; `docs/ROUTINE.md` con el prompt y el id de la
+  Routine, creada apagada. Esta iteración corrió en la rama `ccr-665785e4-ya854h` que el harness asignó a la
   sesión; desde la 2, `loop/<N>-<slug>`.
 - **Cifras sincronizadas** con `scripts/loop_progress.sh` de Brunell_Node (origin/dev
   9d5b8986a63c): 91 % → 87 %, 441 → 901, «Más de 440» → «Más de 900». La prosa de

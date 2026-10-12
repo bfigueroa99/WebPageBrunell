@@ -5,8 +5,12 @@
 - Sesión: nueva por disparo (create_new_session_on_fire: true)
 - Notificación: push
 - Modelo: por defecto
-- ID: trig_<se completa al crearla>
-- Estado: nace apagada; la enciende Benjamin
+- ID: trig_01RY3ekYUyVDvTt4SbWpZRao
+- Estado: creada apagada el 2026-10-12; la enciende Benjamin
+
+Aviso que devolvió la creación: la Routine no guarda conectores MCP, así que las sesiones que
+dispara pueden correr sin herramientas `mcp__github__*`. La skill tiene el fallback `gh api` para
+abrir y fusionar el PR y, si tampoco, deja la rama empujada y lo dice en el informe.
 
 Este archivo es la fuente de verdad del prompt. La iteración CALIDAD compara la Routine con este
 bloque y la corrige con update_trigger. El prompt no incrusta cifras ni reglas a propósito: viven en
