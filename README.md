@@ -62,9 +62,11 @@ texto en degradado `#7c92ee → #a888c8`, fondos carbón `#1a1a1a / #2d2d2d`, ve
 
 ## Antes de publicar
 
-- **Hoja de ruta:** las cifras y etapas son de octubre de 2026 (fuente:
-  `docs/ROADMAP.md` y `docs/PLAN_CRECIMIENTO.md` de Brunell_Node). Actualizarlas en
-  `index.html`, sección `#roadmap`, y en `assets/js/i18n.js` al cerrar cada etapa.
+- **Hoja de ruta:** las cifras de `#roadmap` (en `index.html` y en `assets/js/i18n.js`)
+  salen del panel `scripts/loop_progress.sh` de Brunell_Node, nunca de la prosa:
+  `node tools/producto.mjs --medir && node tools/producto.mjs --aplicar` las mide y las
+  escribe (`docs/producto.json` guarda la medición). A mano quedan sólo «3×» (meta M1 del
+  plan) y `--now`; las etapas llevan `data-fase` para que la herramienta sepa cuál es cuál.
 - **Correo de contacto:** el botón final usa `mailto:` sin destinatario. Cambiarlo
   en `index.html`, sección `#contacto` (hay un comentario justo encima).
 - **Fuentes:** se cargan Inter Tight y JetBrains Mono desde Google Fonts. Sin
@@ -74,6 +76,18 @@ texto en degradado `#7c92ee → #a888c8`, fondos carbón `#1a1a1a / #2d2d2d`, ve
 
 En el repositorio: **Settings → Pages → Build and deployment → Deploy from a
 branch**, elegir la rama `master` y la carpeta `/ (root)`.
+
+## Cómo validar
+
+No hay CI: la puerta es `bash tools/verificar.sh` en la máquina (`--rapido` salta el smoke).
+Corre, en orden, `node tools/check.mjs` (sintaxis, paridad de claves es/en, anclas, ids, `alt`,
+rutas y hosts externos), `node --test tools/*.test.mjs`, `node tools/producto.mjs --check` (las cifras
+contra `docs/producto.json`), `node tools/loop.mjs --check` (guardas de `MEJORAS.md`,
+`docs/ROUTINE.md` y `docs/producto.json`) y `node tools/smoke.mjs` (la página en Chromium:
+escritorio, celular, menos movimiento y es-CL; necesita Playwright). Todas salen 0 ok · 1 desvío
+· 2 no evaluable.
+
+El loop de mejora sigue `MEJORAS.md`; cómo itera está en `.claude/skills/pagina-loop/SKILL.md`.
 
 ## Accesibilidad y rendimiento
 
