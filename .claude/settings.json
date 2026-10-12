@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push *)",
+      "Bash(git fetch *)",
+      "Bash(node tools/*)",
+      "Bash(bash tools/verificar.sh*)",
+      "Bash(gh api repos/bfigueroa99/WebPageBrunell/*)",
+      "mcp__github__create_pull_request",
+      "mcp__github__update_pull_request",
+      "mcp__github__merge_pull_request",
+      "mcp__github__pull_request_read",
+      "mcp__github__list_pull_requests",
+      "mcp__github__add_issue_comment",
+      "mcp__claude-code-remote__get_trigger",
+      "mcp__claude-code-remote__update_trigger"
+    ]
+  }
+}
